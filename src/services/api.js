@@ -15,7 +15,7 @@ let config = {
   },
 };
 
-export const getTokens = async (locationId) => {
+export const getPatients = async (locationId) => {
   try {
     config.params = { location_id: locationId };
     const response = await axios.request(config);
