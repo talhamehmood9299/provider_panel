@@ -2,18 +2,43 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/reducers/authReducer";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../services/firebase";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [location, setLocation] = useState([]);
+  const [selectedLocation, setSelectedLocationLocal] = useState("");
+  const [error, setError] = useState("");
   const [user, setUser] = useState({
-    userName: "",
+    email: "",
     password: "",
   });
 
-  const handleLogin = () => {
-    dispatch(login());
-    navigate("/assistants");
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { email, password } = user;
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // const locationItem = location.find(
+      //   (loc) => loc.value === selectedLocation
+      // );
+      // if (locationItem) {
+      //   dispatch(
+      //     setSelectedLocation({
+      //       location: locationItem.value,
+      //       locationId: locationItem.location_id,
+      //     })
+      //   );
+      // }
+      dispatch(login());
+      navigate("/assistants");
+    } catch (error) {
+      console.error("Error logging in:", error.message);
+      setError(error.message);
+    }
   };
 
   const handleChange = (e) => {
@@ -23,42 +48,53 @@ const Login = () => {
       [name]: value,
     }));
   };
+  // const handleLocationChange = (e) => {
+  //   setSelectedLocationLocal(e.target.value);
+  // };
 
   return (
     <div className="w-full flex items-start justify-center">
       <form
-        onSubmit={handleLogin}
-        className="px-20 mt-32 pt-10 mb-[196px] pb-16 bg-[#1E328F]/15  shadow-2xl flex flex-col items-center justify-center gap-3 rounded-xl "
+        onSubmit={handleFormSubmit}
+        className="px-20 my-32 pt-10 pb-16 bg-[#1E328F]/15  shadow-2xl flex flex-col items-center justify-center gap-3 rounded-xl  "
       >
         <div className="font-semibold text-2xl text-[#1E328F]  text-center py-5">
           Sign in to your account
         </div>
-
-        <label className="rounded flex items-center gap-1">
+        {/* <Select
+          value={selectedLocation}
+          onChange={handleLocationChange}
+          options={location}
+          placeholder="Select Location"
+          styles={{
+            control: "w-60 h-12 border-1 border-blue-500 bg-white rounded-lg",
+          }}
+        /> */}
+        <label className="input input-[#1E328F] bg-white text-black border-blue-500 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             fill="currentColor"
-            className="w-5 h-5 opacity-70"
+            className="w-4 h-4 opacity-70"
           >
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
           </svg>
           <input
             required
-            name="userName"
-            value={user.userName}
+            value={user.email}
             onChange={handleChange}
-            type="text"
-            className="py-2 px-2 rounded border-none border-"
-            placeholder="Username"
+            type="email"
+            name="email"
+            className="grow"
+            placeholder="Email"
           />
         </label>
-        <label className="flex items-center gap-1">
+        <label className="input input-[#1E328F] bg-white text-black border-blue-500 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             fill="currentColor"
-            className="w-5 h-5 opacity-70"
+            className="w-4 h-4 opacity-70"
           >
             <path
               fillRule="evenodd"
@@ -68,15 +104,15 @@ const Login = () => {
           </svg>
           <input
             required
-            name="password"
             value={user.password}
             onChange={handleChange}
+            name="password"
             type="password"
-            className="py-2 px-2 rounded"
+            className="grow"
             placeholder="Password"
           />
         </label>
-        <button className="bg-blue-900 text-white rounded py-2 w-full text-lg mt-5">
+        <button className="btn bg-[#1E328F] hover:bg-blue-800 text-white w-full text-lg mt-5">
           Log in
         </button>
       </form>
