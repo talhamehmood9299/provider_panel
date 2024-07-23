@@ -8,3 +8,4 @@ export { default as Assistant } from "./assistant";
 export { default as AppointmentDetails } from "./appointmentDetails";
 export { default as PatientCheckIn } from "./patientCheckIn";
 export { default as TitanAi } from "./titanAi";
+export { default as Settings } from "./settings";

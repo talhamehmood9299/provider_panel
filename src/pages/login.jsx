@@ -1,43 +1,86 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/reducers/authReducer";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { auth } from "../api/firebase";
+import Select from "../components/Select";
+import { toast } from "react-hot-toast";
+import { getProviders } from "../api/service";
+import { setProvider } from "../redux/reducers/providersReducer";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [location, setLocation] = useState([]);
-  const [selectedLocation, setSelectedLocationLocal] = useState("");
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const [provider, setProviderLocal] = useState([]);
+  const [selectedProvider, setSelectedProvider] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/assistants");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const getProvidersInfo = async () => {
+      try {
+        const data = await getProviders();
+        const options = data.map((item) => ({
+          value: item.name,
+          label: item.name,
+          profile: item.profile,
+          room: item.room,
+          name: item.name,
+          description: item.description,
+        }));
+        setProviderLocal(options);
+      } catch (error) {
+        console.error("Error fetching location:", error);
+      }
+    };
+    getProvidersInfo();
+  }, []);
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!user.email || !user.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
     try {
       const { email, password } = user;
       await signInWithEmailAndPassword(auth, email, password);
-
-      // const locationItem = location.find(
-      //   (loc) => loc.value === selectedLocation
-      // );
-      // if (locationItem) {
-      //   dispatch(
-      //     setSelectedLocation({
-      //       location: locationItem.value,
-      //       locationId: locationItem.location_id,
-      //     })
-      //   );
-      // }
+      const providerInfo = provider.find(
+        (item) => item.value === selectedProvider
+      );
+      console.log("provider info: ", providerInfo);
+      if (providerInfo) {
+        dispatch(
+          setProvider({
+            address: providerInfo.address,
+            name: providerInfo.name,
+            profile: providerInfo.profile,
+            room: providerInfo.room,
+            description: providerInfo.description,
+          })
+        );
+      }
       dispatch(login());
+      toast.success("Login successful");
       navigate("/assistants");
     } catch (error) {
       console.error("Error logging in:", error.message);
-      setError(error.message);
+      if (error.message === "INVALID_LOGIN_CREDENTIALS") {
+        toast.error("Incorrect email or password");
+      } else {
+        toast.error("Incorrect email or password");
+      }
     }
   };
 
@@ -48,9 +91,9 @@ const Login = () => {
       [name]: value,
     }));
   };
-  // const handleLocationChange = (e) => {
-  //   setSelectedLocationLocal(e.target.value);
-  // };
+  const handleProviderChange = (e) => {
+    setSelectedProvider(e.target.value);
+  };
 
   return (
     <div className="w-full flex items-start justify-center">
@@ -61,15 +104,15 @@ const Login = () => {
         <div className="font-semibold text-2xl text-[#1E328F]  text-center py-5">
           Sign in to your account
         </div>
-        {/* <Select
-          value={selectedLocation}
-          onChange={handleLocationChange}
-          options={location}
-          placeholder="Select Location"
+        <Select
+          value={selectedProvider}
+          onChange={handleProviderChange}
+          options={provider}
+          placeholder="Select Provider"
           styles={{
             control: "w-60 h-12 border-1 border-blue-500 bg-white rounded-lg",
           }}
-        /> */}
+        />
         <label className="input input-[#1E328F] bg-white text-black border-blue-500 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"

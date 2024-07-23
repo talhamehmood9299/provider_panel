@@ -1,6 +1,6 @@
 // import { getTokens } from "./api";
 
-import { getPatients } from "./api";
+// import { getPatients } from "./api";
 
 // export const fetchTokens = async (patientId) => {
 //   try {
@@ -42,8 +42,8 @@ import { getPatients } from "./api";
 //   window.speechSynthesis.speak(speech);
 // };
 
-export const getPatientsDetail = async () => {
-  const locationId = "12";
-  const data = await getPatients(locationId);
-  console.log(data);
-};
+// export const getPatientsDetail = async () => {
+//   const locationId = "12";
+//   const data = await getPatients(locationId);
+//   return data;
+// };

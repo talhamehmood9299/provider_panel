@@ -27,6 +27,7 @@ const Sidebar = () => {
       icon: "📍",
     },
     { path: "/assistants/titanAi", name: "Titan AI", icon: "🤖" },
+    { path: "/assistants/settings", name: "Settings", icon: "⚙️" },
   ];
 
   return (

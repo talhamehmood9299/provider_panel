@@ -1,5 +1,6 @@
 import "./App.css";
 import ProtectedRoute from "./components/Protected";
+import Toastify from "./components/Toastify";
 import {
   AppointmentDetails,
   Assistant,
@@ -8,6 +9,7 @@ import {
   Login,
   NotFound,
   PatientCheckIn,
+  Settings,
   TitanAi,
   Unauthorized,
 } from "./pages";
@@ -21,6 +23,7 @@ import {
 const Root = () => (
   <>
     {/* <Header /> */}
+    <Toastify />
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-1 justify-center items-center h-screen bg-gray-100">
         <Outlet />
@@ -58,6 +61,10 @@ const router = createBrowserRouter([
           {
             path: "titanAi",
             element: <TitanAi />,
+          },
+          {
+            path: "settings",
+            element: <Settings />,
           },
         ],
       },
