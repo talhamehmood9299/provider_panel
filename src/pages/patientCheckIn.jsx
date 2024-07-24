@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getLocation, getPatients } from "../api/service.js";
+// import { callPatient, endPatient, getPatients } from "../api/service.js";
 import { formatDate } from "../helpers";
 import { logout } from "../redux/reducers/authReducer.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Popup from "../components/Popup.jsx";
+import Pusher from "pusher-js";
+import ProfileHeader from "../components/ProfileHeader.jsx";
+import TableRow from "../components/TableRow.jsx";
+import { callPatient, endPatient, getPatients } from "../api/apiEndpoints.js";
 
 const tableHeaders = [
   { label: "SR #" },
@@ -14,17 +19,46 @@ const tableHeaders = [
   { label: "Date Of Birth" },
   { label: "Appt time" },
   { label: "Action" },
-  { label: "Status" },
 ];
 
-const cellClassName = "px-6 py-4 whitespace-nowrap text-sm text-gray-500";
-
 const PatientCheckIn = () => {
+  const provider = useSelector((state) => state.provider.providers);
+  const locationId = useSelector((state) => state.auth.selectedLocationId);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
-  const provider = useSelector((state) => state.provider.providers);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const handleDeleteClick = (id) => {
+    setSelectedPatientId(id);
+    setIsPopupOpen(true);
+  };
+  // handle Popup
+  const handleConfirm = async () => {
+    if (selectedPatientId !== null) {
+      setIsDeleting(true);
+      try {
+        await endPatient(selectedPatientId);
+        setPatients(
+          patients.filter((patient) => patient.patient_id !== selectedPatientId)
+        );
+        console.log("Item deleted", selectedPatientId);
+        toast.success("Patient Removed Successfully");
+      } catch (error) {
+        console.error("Error removing patient:", error);
+      } finally {
+        setIsDeleting(false);
+        setIsPopupOpen(false);
+      }
+    }
+  };
+
+  const handleClose = () => {
+    setIsPopupOpen(false);
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -33,52 +67,52 @@ const PatientCheckIn = () => {
   };
 
   const getPatientsDetail = async () => {
-    const locationId = "12";
-    const data = await getPatients(locationId);
-    setPatients(data);
+    const storedData = localStorage.getItem("persist:root");
+    const parsedData = JSON.parse(storedData);
+    const providerData = JSON.parse(parsedData.provider || "{}");
+    const azzId = providerData.providers.azz_id;
+    const { patients } = await getPatients(locationId);
+
+    let filteredPatients = patients.filter(
+      (item) => item.provider_id === azzId
+    );
+    setPatients(filteredPatients);
   };
+
+  useEffect(() => {
+    const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
+      cluster: "mt1",
+    });
+    const callChannel = pusher.subscribe("add-channel");
+    callChannel.bind("add-event", function (data) {
+      getPatientsDetail();
+    });
+
+    return () => {
+      pusher.unsubscribe("add-channel");
+    };
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([getPatientsDetail()]);
       setLoading(false);
     };
-
+    console.log(patients);
     fetchData();
   }, []);
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="w-full py-15 px-10 flex items-center justify-between gap-4 h-[80px] my-1 border rounded-md border-gray-300">
-        <div className="flex flex-col">
-          <span className="text-3xl text-[#1E328F] font-bold">
-            {provider.name}
-          </span>
-          <span className="text-sm text-gray-600">{provider.description}</span>
-        </div>
-
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="m-1">
-            <div className="avatar">
-              <div className="ring-[#1E328F]  w-12 rounded-full ring ring-offset-2">
-                <img src={provider.profile} />
-              </div>
-            </div>
-          </div>
-          <div
-            tabIndex={0}
-            className="dropdown-content menu bg-[#1E328F] text-white  rounded-lg z-[1] w-28 p-2 shadow"
-          >
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-        </div>
-      </div>
+      <ProfileHeader provider={provider} handleLogout={handleLogout} />
       <table className="min-w-full divide-y divide-gray-200 shadow-lg rounded-lg overflow-hidden">
         <thead className="bg-blue-100">
           <tr>
-            {tableHeaders.map((header) => (
+            {tableHeaders.map((header, index) => (
               <th
                 key={header.label}
                 className={`px-6 py-6 text-center text-sm font-bold text-black capitalize tracking-wider`}
+                colSpan={index === tableHeaders.length - 1 ? 2 : 1}
               >
                 {header.label}
               </th>
@@ -90,7 +124,6 @@ const PatientCheckIn = () => {
             <tr>
               <td colSpan="8" className="text-center py-4">
                 <span className="loading loading-bars loading-lg"></span>{" "}
-                {/* Loader */}
               </td>
             </tr>
           ) : (
@@ -99,41 +132,46 @@ const PatientCheckIn = () => {
                 key={patient.id}
                 className="hover:bg-gray-100 border-b last:border-none"
               >
-                <TableCell additionalClasses="font-medium text-gray-900">
+                <TableRow additionalClasses="font-medium text-gray-900">
                   {`0${index + 1}`}
-                </TableCell>
-                <TableCell>{patient.first_name}</TableCell>
-                <TableCell>{patient.lastname}</TableCell>
-                <TableCell>{patient.gender}</TableCell>
-                <TableCell>{patient.dob}</TableCell>
-                <TableCell>{formatDate(patient.updated_at)}</TableCell>
-                <TableCell additionalClasses="font-medium">
-                  <button className="bg-[#1E328F] text-white px-4 py-2 rounded-lg hover:bg-blue-800">
+                </TableRow>
+                <TableRow>{patient.first_name}</TableRow>
+                <TableRow>{patient.lastname}</TableRow>
+                <TableRow>{patient.gender}</TableRow>
+                <TableRow>{patient.dob}</TableRow>
+                <TableRow>{formatDate(patient.updated_at)}</TableRow>
+                <TableRow additionalClasses="font-medium">
+                  <button
+                    className="bg-[#1E328F] text-white px-4 py-2 rounded-lg hover:bg-blue-800"
+                    onClick={() => {
+                      callPatient(patient.patient_id);
+                      toast.success("Patient is now called");
+                    }}
+                  >
                     Call Patient
                   </button>
-                </TableCell>
-                <TableCell>
-                  <button className="bg-blue-100 hover:bg-blue-200 text-black px-4 py-2 rounded-lg">
-                    {patient.status}
+                </TableRow>
+                <TableRow>
+                  <button
+                    className="bg-blue-100 hover:bg-blue-200 text-black px-4 py-2 rounded-lg"
+                    onClick={() => handleDeleteClick(patient.patient_id)}
+                  >
+                    Done
                   </button>
-                </TableCell>
+                </TableRow>
               </tr>
             ))
           )}
         </tbody>
       </table>
+      <Popup
+        isOpen={isPopupOpen}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };
 
 export default PatientCheckIn;
-
-const TableCell = ({ children, additionalClasses = "" }) => {
-  return (
-    <td
-      className={`px-6 py-4 whitespace-nowrap border-r text-sm text-black text-center ${additionalClasses}`}
-    >
-      {children}
-    </td>
-  );
-};

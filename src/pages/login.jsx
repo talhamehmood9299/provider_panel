@@ -6,15 +6,21 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../api/firebase";
 import Select from "../components/Select";
 import { toast } from "react-hot-toast";
-import { getProviders } from "../api/service";
+// import { getProviders, getLocations } from "../api/service";
 import { setProvider } from "../redux/reducers/providersReducer";
+import { setSelectedLocation } from "../redux/reducers/locationReducer";
+import { getLocations, getProviders } from "../api/apiEndpoints";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  // Provider states
   const [provider, setProviderLocal] = useState([]);
   const [selectedProvider, setSelectedProvider] = useState("");
+  // Location states
+  const [location, setLocation] = useState([]);
+  const [selectedLocation, setSelectedLocationLocal] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState({
     email: "",
@@ -38,6 +44,8 @@ const Login = () => {
           room: item.room,
           name: item.name,
           description: item.description,
+          address: item.address,
+          azz_id: item.azz_id,
         }));
         setProviderLocal(options);
       } catch (error) {
@@ -45,6 +53,24 @@ const Login = () => {
       }
     };
     getProvidersInfo();
+  }, []);
+
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        const { addresses } = await getLocations();
+        const options = addresses.map((item) => ({
+          value: item.city,
+          label: item.city,
+          location_id: item.location_id,
+          address: item.address,
+        }));
+        setLocation(options);
+      } catch (error) {
+        console.error("Error fetching location:", error);
+      }
+    };
+    getLocation();
   }, []);
 
   const handleFormSubmit = async (e) => {
@@ -59,7 +85,6 @@ const Login = () => {
       const providerInfo = provider.find(
         (item) => item.value === selectedProvider
       );
-      console.log("provider info: ", providerInfo);
       if (providerInfo) {
         dispatch(
           setProvider({
@@ -68,6 +93,20 @@ const Login = () => {
             profile: providerInfo.profile,
             room: providerInfo.room,
             description: providerInfo.description,
+            address: providerInfo.address,
+            azz_id: providerInfo.azz_id,
+          })
+        );
+      }
+      const locationItem = location.find(
+        (loc) => loc.value === selectedLocation
+      );
+      if (locationItem) {
+        dispatch(
+          setSelectedLocation({
+            location: locationItem.value,
+            locationId: locationItem.location_id,
+            address: locationItem.address,
           })
         );
       }
@@ -93,6 +132,9 @@ const Login = () => {
   };
   const handleProviderChange = (e) => {
     setSelectedProvider(e.target.value);
+  };
+  const handleLocationChange = (e) => {
+    setSelectedLocationLocal(e.target.value);
   };
 
   return (
@@ -155,6 +197,17 @@ const Login = () => {
             placeholder="Password"
           />
         </label>
+
+        <Select
+          required
+          value={selectedLocation}
+          onChange={handleLocationChange}
+          options={location}
+          placeholder="Select Location"
+          styles={{
+            control: "w-60 h-12 border-1 border-blue-500 bg-white rounded-lg",
+          }}
+        />
         <button className="btn bg-[#1E328F] hover:bg-blue-800 text-white w-full text-lg mt-5">
           Log in
         </button>
