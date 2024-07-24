@@ -41,12 +41,11 @@ const PatientCheckIn = () => {
     if (selectedPatientId !== null) {
       setIsDeleting(true);
       try {
-        await endPatient(selectedPatientId);
+        const data = await endPatient(selectedPatientId);
         setPatients(
           patients.filter((patient) => patient.patient_id !== selectedPatientId)
         );
-        console.log("Item deleted", selectedPatientId);
-        toast.success("Patient Removed Successfully");
+        toast.success(data.message);
       } catch (error) {
         console.error("Error removing patient:", error);
       } finally {
@@ -102,6 +101,15 @@ const PatientCheckIn = () => {
     fetchData();
   }, []);
 
+  const handleCallPatient = async (id) => {
+    try {
+      const data = await callPatient(id);
+      toast.success(data.message);
+    } catch (error) {
+      console.error("Error in calling patient:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-5">
       <ProfileHeader provider={provider} handleLogout={handleLogout} />
@@ -143,10 +151,7 @@ const PatientCheckIn = () => {
                 <TableRow additionalClasses="font-medium">
                   <button
                     className="bg-[#1E328F] text-white px-4 py-2 rounded-lg hover:bg-blue-800"
-                    onClick={() => {
-                      callPatient(patient.patient_id);
-                      toast.success("Patient is now called");
-                    }}
+                    onClick={() => handleCallPatient(patient.patient_id)}
                   >
                     Call Patient
                   </button>
