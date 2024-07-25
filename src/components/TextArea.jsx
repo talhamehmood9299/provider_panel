@@ -1,5 +1,5 @@
 const TextArea = ({ label, placeholder, value, onChange, name }) => (
-  <div className="flex items-start space-x-4">
+  <div className="flex items-center space-x-4">
     <label className="w-32 font-semibold text-black">{label}</label>
     <textarea
       placeholder={placeholder}

@@ -88,7 +88,6 @@ const Login = () => {
       if (providerInfo) {
         dispatch(
           setProvider({
-            address: providerInfo.address,
             name: providerInfo.name,
             profile: providerInfo.profile,
             room: providerInfo.room,
@@ -155,6 +154,16 @@ const Login = () => {
             control: "w-60 h-12 border-1 border-blue-500 bg-white rounded-lg",
           }}
         />
+        <Select
+          required
+          value={selectedLocation}
+          onChange={handleLocationChange}
+          options={location}
+          placeholder="Select Location"
+          styles={{
+            control: "w-60 h-12 border-1 border-blue-500 bg-white rounded-lg",
+          }}
+        />
         <label className="input input-[#1E328F] bg-white text-black border-blue-500 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -198,16 +207,6 @@ const Login = () => {
           />
         </label>
 
-        <Select
-          required
-          value={selectedLocation}
-          onChange={handleLocationChange}
-          options={location}
-          placeholder="Select Location"
-          styles={{
-            control: "w-60 h-12 border-1 border-blue-500 bg-white rounded-lg",
-          }}
-        />
         <button className="btn bg-[#1E328F] hover:bg-blue-800 text-white w-full text-lg mt-5">
           Log in
         </button>

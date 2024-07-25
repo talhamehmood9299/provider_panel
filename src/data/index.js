@@ -45,3 +45,13 @@ export const patients = [
     status: "Done",
   },
 ];
+
+export const tableHeaders = [
+  { label: "SR #" },
+  { label: "First Name" },
+  { label: "Last Name" },
+  { label: "Gender" },
+  { label: "Date Of Birth" },
+  { label: "Appt time" },
+  { label: "Action" },
+];

@@ -1,36 +1,20 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-// import { callPatient, endPatient, getPatients } from "../api/service.js";
+import { useSelector } from "react-redux";
 import { formatDate } from "../helpers";
-import { logout } from "../redux/reducers/authReducer.js";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Popup from "../components/Popup.jsx";
 import Pusher from "pusher-js";
-import ProfileHeader from "../components/ProfileHeader.jsx";
 import TableRow from "../components/TableRow.jsx";
 import { callPatient, endPatient, getPatients } from "../api/apiEndpoints.js";
-
-const tableHeaders = [
-  { label: "SR #" },
-  { label: "First Name" },
-  { label: "Last Name" },
-  { label: "Gender" },
-  { label: "Date Of Birth" },
-  { label: "Appt time" },
-  { label: "Action" },
-];
+import { tableHeaders } from "../data/index.js";
 
 const PatientCheckIn = () => {
-  const provider = useSelector((state) => state.provider.providers);
-  const locationId = useSelector((state) => state.auth.selectedLocationId);
+  const locationId = useSelector((state) => state.location.selectedLocationId);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleDeleteClick = (id) => {
     setSelectedPatientId(id);
@@ -57,12 +41,6 @@ const PatientCheckIn = () => {
 
   const handleClose = () => {
     setIsPopupOpen(false);
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
-    toast.success("You are now logged out");
   };
 
   const getPatientsDetail = async () => {
@@ -97,7 +75,6 @@ const PatientCheckIn = () => {
       await Promise.all([getPatientsDetail()]);
       setLoading(false);
     };
-    console.log(patients);
     fetchData();
   }, []);
 
@@ -111,8 +88,7 @@ const PatientCheckIn = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <ProfileHeader provider={provider} handleLogout={handleLogout} />
+    <>
       <table className="min-w-full divide-y divide-gray-200 shadow-lg rounded-lg overflow-hidden">
         <thead className="bg-blue-100">
           <tr>
@@ -175,7 +151,7 @@ const PatientCheckIn = () => {
         onConfirm={handleConfirm}
         isLoading={isDeleting}
       />
-    </div>
+    </>
   );
 };
 

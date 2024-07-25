@@ -36,5 +36,6 @@ export const updateProfile = async (profileData) => {
     "post",
     profileData
   );
+  console.log("data in api: ", data);
   return data;
 };
