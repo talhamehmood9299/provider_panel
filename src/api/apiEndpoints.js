@@ -39,3 +39,12 @@ export const updateProfile = async (profileData) => {
   console.log("data in api: ", data);
   return data;
 };
+
+export const getSlotsByProvider = async (providerId, startDate, endDate) => {
+  const data = await request("/api/v1/slots-by-provider", "get", null, {
+    provider_id: providerId,
+    start_date: startDate,
+    end_date: endDate,
+  });
+  return data;
+};
