@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { MdCancel } from "react-icons/md";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import Select from "../components/Select";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
-import SearchBox from "../components/search";
 import { IoMdSend } from "react-icons/io";
+import SearchBox from "../components/Search";
 
 const TitanAi = () => {
   const [isTranscriptVisible, setIsTranscriptVisible] = useState(false);
@@ -94,10 +92,6 @@ const TitanAi = () => {
                 className="flex items-center cursor-pointer mt-3"
               >
                 <p className="font-medium text-gray-600">Transcript</p>
-                <FontAwesomeIcon
-                  icon={isTranscriptVisible ? faChevronUp : faChevronDown}
-                  className="ml-2 text-[#1E328F]"
-                />
               </div>
               {isTranscriptVisible && (
                 <div className="mt-3">
