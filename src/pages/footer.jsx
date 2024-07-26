@@ -17,12 +17,6 @@ const Footer = () => {
           <p>609-890-1050</p>
         </div>
       </div>
-      <div className="absolute top-[-140px] left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-        <p className="text-md font-serif font-bold text-blue-900">
-          Scan To Visit
-        </p>
-        <img src="/qrCode.png" alt="QR Code" className="w-20 h-20" />
-      </div>
     </div>
   );
 };
