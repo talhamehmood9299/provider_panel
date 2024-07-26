@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useState } from "react";
 import DateInput from "../components/DateInput";
 import DateCard from "../components/DateCard";
-import { times } from "../data";
 import { getSlotsByProvider } from "../api/apiEndpoints";
 import { useSelector } from "react-redux";
-// import { formatDate } from "../helpers/index";
+import { formatDate, formatTime } from "../helpers";
 
 const AppointmentDetails = () => {
   const provider = useSelector((state) => state.provider.providers);
@@ -30,9 +29,7 @@ const AppointmentDetails = () => {
         const { data, locations } = response;
 
         if (data && Array.isArray(data)) {
-          // Extract dates
           const extractedDates = data.map((item) => new Date(item.date));
-          console.log("Extracted dates: ", extractedDates);
           setDates(extractedDates);
 
           // Extract slots by location
@@ -42,25 +39,17 @@ const AppointmentDetails = () => {
               locationName: location.location_name,
             }))
           );
-          console.log(
-            "Extracted slots by location: ",
-            extractedSlotsNameByLocation
-          );
           setSlotsNameByLocation(extractedSlotsNameByLocation);
 
-          // Extract slots
           const extractedSlots = data.flatMap((item) =>
             item.slots_by_location.flatMap((location) =>
-              location.slots
-                .filter((slot) => !slot.booked)
-                .map((slot) => ({
-                  booked: slot.booked,
-                  startTime: new Date(slot.start_time),
-                  endTime: new Date(slot.end_time),
-                }))
+              location.slots.map((slot) => ({
+                booked: slot.booked,
+                startTime: new Date(slot.start_time),
+                endTime: new Date(slot.end_time),
+              }))
             )
           );
-          console.log("Extracted slots: ", extractedSlots);
           setSlots(extractedSlots);
         } else {
           console.error("Unexpected data format:", data);
@@ -71,7 +60,6 @@ const AppointmentDetails = () => {
             id: loc.id,
             name: loc.name,
           }));
-          console.log("Locations:", locationsData);
         } else {
           console.error("Unexpected locations format:", locations);
         }
@@ -81,29 +69,13 @@ const AppointmentDetails = () => {
     } catch (error) {
       console.error("Error fetching slots:", error);
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
   const handleDateSubmit = (e) => {
     e.preventDefault();
     fetchSlotsByProviders();
-  };
-
-  const formatDate = (date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-    }).format(date);
-  };
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
   };
 
   return (
@@ -138,19 +110,16 @@ const AppointmentDetails = () => {
                   (slot) =>
                     slot.startTime.toDateString() === date.toDateString()
                 );
-
-                const formattedSlots = dateSlots.map(
-                  (slot) =>
-                    `${formatTime(slot.startTime)} - ${formatTime(
-                      slot.endTime
-                    )}`
-                );
+                const formattedSlots = dateSlots.map((slot) => ({
+                  time: `${formatTime(slot.startTime)}`,
+                  booked: slot.booked,
+                }));
 
                 return (
                   <DateCard
                     key={index}
                     date={formatDate(date)}
-                    times={formattedSlots}
+                    slots={formattedSlots}
                   />
                 );
               })
@@ -163,52 +132,3 @@ const AppointmentDetails = () => {
 };
 
 export default AppointmentDetails;
-
-// const fetchSlotsByProviders = async () => {
-//   console.log("start date: ", startDate.toISOString().split("T")[0]);
-//   try {
-//     if (provider && provider.azz_id) {
-//       const response = await getSlotsByProvider(
-//         provider.azz_id,
-//         startDate,
-//         endDate
-//       );
-
-//       const { message, provider_id, status, data, locations } = response;
-//       if (data && Array.isArray(data)) {
-//         // Extract slots data
-//         const slotsByDate = data.map((item) => ({
-//           date: new Date(item.date),
-//           slotsByLocation: item.slots_by_location.map((location) => ({
-//             locationId: location.location_id,
-//             locationName: location.location_name,
-//             slots: location.slots.map((slot) => ({
-//               booked: slot.booked,
-//               startTime: new Date(slot.start_time),
-//               endTime: new Date(slot.end_time),
-//             })),
-//           })),
-//         }));
-
-//         console.log("Slots by date:", slotsByDate);
-//         setSlotsByLocation(slotsByDate);
-//       } else {
-//         console.error("Unexpected data format:", data);
-//       }
-
-//       if (locations && Array.isArray(locations)) {
-//         const locationsData = locations.map((loc) => ({
-//           id: loc.id,
-//           name: loc.name,
-//         }));
-//         setLocations(locationsData);
-//       } else {
-//         console.error("Unexpected locations format:", locations);
-//       }
-//     } else {
-//       console.error("Provider azz_id not found or provider is not an object");
-//     }
-//   } catch (error) {
-//     console.error("Error fetching slots:", error);
-//   }
-// };

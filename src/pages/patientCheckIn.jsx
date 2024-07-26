@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { formatDate } from "../helpers";
+import { formatDateTime } from "../helpers";
 import toast from "react-hot-toast";
 import Popup from "../components/Popup.jsx";
 import Pusher from "pusher-js";
@@ -123,7 +123,7 @@ const PatientCheckIn = () => {
                 <TableRow>{patient.lastname}</TableRow>
                 <TableRow>{patient.gender}</TableRow>
                 <TableRow>{patient.dob}</TableRow>
-                <TableRow>{formatDate(patient.updated_at)}</TableRow>
+                <TableRow>{formatDateTime(patient.appt_time)}</TableRow>
                 <TableRow additionalClasses="font-medium">
                   <button
                     className="bg-[#1E328F] text-white px-4 py-2 rounded-lg hover:bg-blue-800"
