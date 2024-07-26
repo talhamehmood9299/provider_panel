@@ -47,3 +47,23 @@ export const getSlotsByProvider = async (providerId, startDate, endDate) => {
   });
   return data;
 };
+
+export const getProviderDictations = async (providerId) => {
+  const data = await request("/api/v1/get-provider-dictations", "get", null, {
+    provider_id: providerId,
+  });
+  return data;
+};
+
+export const sendDictation = async (dictationData) => {
+  const data = await request("/api/v1/store-dictation", "post", dictationData);
+  return data;
+};
+
+export const sendTranslatedText = async (id, text) => {
+  const data = await request("/api/v1/send-text", "put", null, {
+    id,
+    text,
+  });
+  return data;
+};

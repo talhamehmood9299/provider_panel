@@ -14,3 +14,29 @@ html, body {
   width: 100%;
   overflow: hidden;
 }
+
+.custom-audio-player {
+  width: 100%;
+  padding: 10px 0;
+}
+/* Light gray background */
+
+.custom-audio-player::-webkit-media-controls-panel {
+  background-color: #1E328F; 
+  border-radius: 10px;
+}
+
+.custom-audio-player::-webkit-media-controls-play-button,
+.custom-audio-player::-webkit-media-controls-mute-button {
+  background-color: #1E328F; 
+  border-radius: 50%;
+}
+
+.custom-audio-player::-webkit-media-controls-timeline {
+  color: white; 
+  }
+
+.custom-audio-player::-webkit-media-controls-current-time-display,
+.custom-audio-player::-webkit-media-controls-time-remaining-display {
+  color: white; 
+}

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const SearchBox = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
 
   const handleInputChange = (e) => {
-    setQuery(e.target.value);
+    const value = e.target.value;
+    setQuery(value);
+    onSearch(value);
   };
 
   const handleSearch = (e) => {
