@@ -6,22 +6,29 @@ import { RxCross2 } from "react-icons/rx";
 import { IoMdSend } from "react-icons/io";
 import { getPatients, sendDictation } from "../api/apiEndpoints";
 import toast from "react-hot-toast";
+import { visualizeData } from "../helpers/visualizeData";
 
 const DictationNote = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
   const provider = useSelector((state) => state.provider.providers);
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
-  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [recordedUrl, setRecordedUrl] = useState(null);
   const audioChunksRef = useRef([]);
-
   const [formData, setFormData] = useState({
     name_of_patient: "",
-    provider_id: provider?.azz_id || "", // Use optional chaining to avoid errors
+    provider_id: provider?.azz_id || "",
     audio_file: null,
     comments: "",
   });
+
+  // Audio visualization setup
+  const audioContextRef = useRef(null);
+  const analyzerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const audioRef = useRef(null);
+  const animationControllerRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
 
   const getPatientsDetail = async () => {
     try {
@@ -42,15 +49,25 @@ const DictationNote = () => {
 
   useEffect(() => {
     getPatientsDetail();
-  }, [provider, locationId]); // Include dependencies in the dependency array
+  }, [provider, locationId]);
+
+  const setupAudioContext = () => {
+    if (audioContextRef.current) return;
+    audioContextRef.current = new AudioContext();
+    analyzerRef.current = audioContextRef.current.createAnalyser();
+  };
 
   const startRecording = () => {
+    setupAudioContext();
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
         const recorder = new MediaRecorder(stream);
-        setMediaRecorder(recorder);
+        mediaRecorderRef.current = recorder; // Store MediaRecorder in ref
+        const source = audioContextRef.current.createMediaStreamSource(stream);
+        source.connect(analyzerRef.current);
         audioChunksRef.current = [];
+
         recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             audioChunksRef.current.push(event.data);
@@ -60,7 +77,7 @@ const DictationNote = () => {
         recorder.onstop = async () => {
           if (audioChunksRef.current.length > 0) {
             const audioBlob = new Blob(audioChunksRef.current, {
-              type: "audio/webm",
+              type: "audio/mp3",
             });
             const audioUrl = URL.createObjectURL(audioBlob);
             setRecordedUrl(audioUrl);
@@ -72,39 +89,37 @@ const DictationNote = () => {
         };
 
         recorder.start();
+        visualizeData({
+          canvasRef,
+          audioContextRef,
+          analyzerRef,
+          barWidth: 3,
+          gradientColors: ["#2392f5", "#fe0095", "purple"],
+          visualizationType: "bars",
+        });
         toast.success("Recording started");
       })
       .catch((error) => console.error("Error accessing microphone:", error));
   };
 
   const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop()); // Stop all tracks
+      mediaRecorderRef.current = null; // Clear MediaRecorder reference
+      if (animationControllerRef.current) {
+        cancelAnimationFrame(animationControllerRef.current);
+        animationControllerRef.current = null;
+      }
       toast.success("Recording stopped");
     }
   };
 
-  const convertBlobToAudioFile = async (blob) => {
-    console.log("blob :", blob);
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        // No need to convert if already in desired format; use blob directly
-        const audioFile = new File([blob], "recording.mp3", {
-          type: "audio/mp3",
-        });
-        resolve(audioFile);
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(blob); // Use ArrayBuffer for better control
-    });
-  };
-
   const handleFileConversion = async (blob) => {
-    console.log("blob :", blob);
     try {
-      const file = new File([blob], "recording.webm", { type: "audio/webm" });
+      const file = new File([blob], "recording.mp3", { type: "audio/mp3" });
       setFormData((prev) => ({
         ...prev,
         audio_file: file,
@@ -114,15 +129,6 @@ const DictationNote = () => {
     }
   };
 
-  const dataURLToBlob = (dataURL, mimeType) => {
-    const binary = atob(dataURL.split(",")[1]);
-    const array = [];
-    for (let i = 0; i < binary.length; i++) {
-      array.push(binary.charCodeAt(i));
-    }
-    return new Blob([new Uint8Array(array)], { type: mimeType });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.audio_file || !formData.name_of_patient) {
@@ -130,19 +136,14 @@ const DictationNote = () => {
       return;
     }
 
-    const file = await convertBlobToAudioFile(formData.audio_file);
-    const file2 = new File([file], "recording.mp3", { type: "audio/mp3" });
-
-    console.log("sdddddddddd", formData.audio_file.name);
-
     const formDataToSend = new FormData();
     formDataToSend.append("name_of_patient", formData.name_of_patient);
     formDataToSend.append("provider_id", formData.provider_id);
-    formDataToSend.append("audio_file", formData.audio_file.name);
+    formDataToSend.append("audio_file", formData.audio_file);
     formDataToSend.append("comments", formData.comments);
 
     try {
-      const res = await sendDictation(formData);
+      const res = await sendDictation(formDataToSend);
       console.log("Dictation sent successfully: ", res);
     } catch (error) {
       console.error("Error sending dictation:", error);
@@ -151,9 +152,6 @@ const DictationNote = () => {
 
   const handlePatientChange = (e) => {
     const selectedOptionValue = e.target.value;
-    console.log("Selected Option Value:", selectedOptionValue);
-
-    // Find the selected patient from the list
     const selectedPatient = patientNames.find(
       (option) => option.value === selectedOptionValue
     );
@@ -169,6 +167,20 @@ const DictationNote = () => {
       comments: e.target.value,
     }));
   };
+
+  useEffect(() => {
+    return () => {
+      if (animationControllerRef.current) {
+        cancelAnimationFrame(animationControllerRef.current);
+      }
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stream
+          .getTracks()
+          .forEach((track) => track.stop()); // Ensure tracks are stopped
+        mediaRecorderRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -195,6 +207,13 @@ const DictationNote = () => {
           value={formData.comments}
           onChange={handleCommentsChange}
         />
+        <div className="w-full h-[130px] relative bg-white border rounded-lg mb-10"></div>
+        <canvas
+          ref={canvasRef}
+          width={452}
+          className="absolute top-[533px]"
+          height={100}
+        />
         <div className="flex items-center justify-between relative rounded-full border-2 bg-white py-2 px-[20px] mx-20 my-5">
           <button
             type="button"
@@ -219,7 +238,14 @@ const DictationNote = () => {
             <IoMdSend size={22} className="text-black" />
           </button>
         </div>
-        {recordedUrl && <audio controls src={recordedUrl} className="mt-4" />}
+        {recordedUrl && (
+          <audio
+            ref={audioRef}
+            className="custom-audio-player mt-3 w-full"
+            controls
+            src={recordedUrl}
+          />
+        )}
       </form>
     </div>
   );
