@@ -4,17 +4,20 @@ const apiUrl = import.meta.env.VITE_BASE_URL;
 const clientId = import.meta.env.VITE_CLIENT_ID;
 const authToken = import.meta.env.VITE_AUTH_TOKEN;
 
-const createConfig = (url, method = "get", data = null, params = {}) => ({
-  method,
-  url: `${apiUrl}${url}`,
-  headers: {
-    client_id: clientId,
-    auth_token: authToken,
-    "Content-Type": "application/json",
-  },
-  params,
-  data,
-});
+const createConfig = (url, method = "get", data = null, params = {}) => {
+  const isFormData = data instanceof FormData;
+  return {
+    method,
+    url: `${apiUrl}${url}`,
+    headers: {
+      client_id: clientId,
+      auth_token: authToken,
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    },
+    params,
+    data,
+  };
+};
 
 export const request = async (
   url,

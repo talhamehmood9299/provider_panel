@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Select from "./Select";
 import { AiFillAudio } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
@@ -7,10 +7,15 @@ import { IoMdSend } from "react-icons/io";
 import { getPatients, sendDictation } from "../api/apiEndpoints";
 import toast from "react-hot-toast";
 import { visualizeData } from "../helpers/visualizeData";
+import {
+  setAudioBlob,
+  setTranscription,
+} from "../redux/reducers/recordingReducer";
 
 const DictationNote = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
   const provider = useSelector((state) => state.provider.providers);
+  const dispatch = useDispatch();
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [recordedUrl, setRecordedUrl] = useState(null);
@@ -63,7 +68,7 @@ const DictationNote = () => {
       .getUserMedia({ audio: true })
       .then((stream) => {
         const recorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = recorder; // Store MediaRecorder in ref
+        mediaRecorderRef.current = recorder;
         const source = audioContextRef.current.createMediaStreamSource(stream);
         source.connect(analyzerRef.current);
         audioChunksRef.current = [];
@@ -77,11 +82,15 @@ const DictationNote = () => {
         recorder.onstop = async () => {
           if (audioChunksRef.current.length > 0) {
             const audioBlob = new Blob(audioChunksRef.current, {
-              type: "audio/mp3",
+              type: "audio/mpeg ",
             });
             const audioUrl = URL.createObjectURL(audioBlob);
             setRecordedUrl(audioUrl);
             await handleFileConversion(audioBlob);
+            // dispatch(setAudioBlob(audioUrl));
+            // Call your speech-to-text API here
+            // const transcription = await transcribeAudio(audioBlob);
+            // dispatch(setTranscription(transcription));
             audioChunksRef.current = [];
           } else {
             console.error("No audio chunks available to create Blob.");
@@ -117,9 +126,22 @@ const DictationNote = () => {
     }
   };
 
+  const transcribeAudio = async (audioBlob) => {
+    const formData = new FormData();
+    formData.append("file", audioBlob);
+
+    const response = await fetch("/api/speech-to-text", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    return result.transcription;
+  };
+
   const handleFileConversion = async (blob) => {
     try {
-      const file = new File([blob], "recording.mp3", { type: "audio/mp3" });
+      const file = new File([blob], "recording.mp3", { type: "audio/mpeg" });
       setFormData((prev) => ({
         ...prev,
         audio_file: file,
