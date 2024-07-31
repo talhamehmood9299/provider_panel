@@ -1,5 +1,5 @@
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DateInput from "../components/DateInput";
 import DateCard from "../components/DateCard";
 import { getSlotsByProvider } from "../api/apiEndpoints";
@@ -83,7 +83,7 @@ const AppointmentDetails = () => {
 
   return (
     <main className="min-h-screen bg-gray-100 pb-28 flex items-start justify-center">
-      <div className="bg-white shadow-lg rounded-2xl overflow-hidden w-full max-w-7xl h-[100vh]">
+      <div className="bg-white shadow-lg rounded-2xl overflow-hidden w-full h-[80vh]">
         <div className="p-6">
           <h2 className="text-2xl font-bold text-center mb-6 text-blue-900">
             Select Date & Time
@@ -97,12 +97,12 @@ const AppointmentDetails = () => {
             <DateInput label="End Date:" date={endDate} setDate={setEndDate} />
             <button
               onClick={handleDateSubmit}
-              className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-900 transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-800 transition duration-300 ease-in-out transform hover:scale-105"
             >
               GO
             </button>
           </div>
-          <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+          <div className="space-y-6 max-h-[calc(80vh-200px)] overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <span className="loading loading-bars loading-lg"></span>

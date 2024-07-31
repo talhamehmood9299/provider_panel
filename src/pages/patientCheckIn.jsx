@@ -101,7 +101,7 @@ const PatientCheckIn = () => {
             {tableHeaders.map((header, index) => (
               <th
                 key={header.label}
-                className={`px-6 py-6 text-center text-sm font-bold text-black capitalize tracking-wider`}
+                className={`px-4 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-bold text-black capitalize tracking-wider `}
                 colSpan={index === tableHeaders.length - 1 ? 2 : 1}
               >
                 {header.label}
