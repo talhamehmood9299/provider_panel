@@ -33,13 +33,13 @@ const AppointmentDetails = () => {
           setDates(extractedDates);
 
           // Extract slots by location
-          const extractedSlotsNameByLocation = data.flatMap((item) =>
-            item.slots_by_location.map((location) => ({
-              locationId: location.location_id,
-              locationName: location.location_name,
-            }))
-          );
-          setSlotsNameByLocation(extractedSlotsNameByLocation);
+          // const extractedSlotsNameByLocation = data.flatMap((item) =>
+          //   item.slots_by_location.map((location) => ({
+          //     locationId: location.location_id,
+          //     locationName: location.location_name,
+          //   }))
+          // );
+          // setSlotsNameByLocation(extractedSlotsNameByLocation);
 
           const extractedSlots = data.flatMap((item) =>
             item.slots_by_location

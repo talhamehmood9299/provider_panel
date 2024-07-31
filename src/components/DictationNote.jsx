@@ -166,7 +166,8 @@ const DictationNote = () => {
 
     try {
       const res = await sendDictation(formDataToSend);
-      console.log("Dictation sent successfully: ", res);
+      toast.success(res.message);
+      return res;
     } catch (error) {
       console.error("Error sending dictation:", error);
     }

@@ -10,6 +10,7 @@ import { tableHeaders } from "../data/index.js";
 
 const PatientCheckIn = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
+  const provider = useSelector((state) => state.provider.providers);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [patients, setPatients] = useState([]);
@@ -26,8 +27,10 @@ const PatientCheckIn = () => {
       setIsDeleting(true);
       try {
         const data = await endPatient(selectedPatientId);
-        setPatients(
-          patients.filter((patient) => patient.patient_id !== selectedPatientId)
+        setPatients((prevPatients) =>
+          prevPatients.filter(
+            (patient) => patient.patient_id !== selectedPatientId
+          )
         );
         toast.success(data.message);
       } catch (error) {
@@ -44,16 +47,22 @@ const PatientCheckIn = () => {
   };
 
   const getPatientsDetail = async () => {
-    const storedData = localStorage.getItem("persist:root");
-    const parsedData = JSON.parse(storedData);
-    const providerData = JSON.parse(parsedData.provider || "{}");
-    const azzId = providerData.providers.azz_id;
-    const { patients } = await getPatients(locationId);
-
-    let filteredPatients = patients.filter(
-      (item) => item.provider_id === azzId
-    );
-    setPatients(filteredPatients);
+    // const storedData = localStorage.getItem("persist:root");
+    // const parsedData = JSON.parse(storedData);
+    // const providerData = JSON.parse(parsedData.provider || "{}");
+    try {
+      setLoading(true);
+      const response = await getPatients(locationId);
+      const fetchedPatients = response.patients || [];
+      const filteredPatients = fetchedPatients.filter(
+        (item) => item.provider_id === provider.azz_id
+      );
+      setPatients(filteredPatients);
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -66,17 +75,14 @@ const PatientCheckIn = () => {
     });
 
     return () => {
+      callChannel.unbind("add-event");
       pusher.unsubscribe("add-channel");
     };
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([getPatientsDetail()]);
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+    getPatientsDetail();
+  }, [locationId]);
 
   const handleCallPatient = async (id) => {
     try {
