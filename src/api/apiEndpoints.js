@@ -56,10 +56,7 @@ export const getProviderDictations = async (providerId) => {
 };
 
 export const sendDictation = async (dictationData) => {
-  console.log("data in dictiation from file: ", dictationData);
-
   const data = await request("/api/v1/store-dictation", "post", dictationData);
-  console.log("api response: ", data);
   return data;
 };
 

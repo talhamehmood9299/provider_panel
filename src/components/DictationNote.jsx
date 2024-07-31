@@ -7,17 +7,16 @@ import { IoMdSend } from "react-icons/io";
 import { getPatients, sendDictation } from "../api/apiEndpoints";
 import toast from "react-hot-toast";
 import { visualizeData } from "../helpers/visualizeData";
-import {
-  setAudioBlob,
-  setTranscription,
-} from "../redux/reducers/recordingReducer";
+import { setTranscription } from "../redux/reducers/recordingReducer";
 
 const DictationNote = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
   const provider = useSelector((state) => state.provider.providers);
+  const transcription = useSelector((state) => state.recording.transcription);
   const dispatch = useDispatch();
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
+  const [temporaryTranscription, setTemporaryTranscription] = useState("");
   const [recordedUrl, setRecordedUrl] = useState(null);
   const audioChunksRef = useRef([]);
   const [formData, setFormData] = useState({
@@ -84,13 +83,10 @@ const DictationNote = () => {
             const audioBlob = new Blob(audioChunksRef.current, {
               type: "audio/mpeg ",
             });
+            console.log("Audio Blob:", audioBlob);
             const audioUrl = URL.createObjectURL(audioBlob);
             setRecordedUrl(audioUrl);
             await handleFileConversion(audioBlob);
-            // dispatch(setAudioBlob(audioUrl));
-            // Call your speech-to-text API here
-            // const transcription = await transcribeAudio(audioBlob);
-            // dispatch(setTranscription(transcription));
             audioChunksRef.current = [];
           } else {
             console.error("No audio chunks available to create Blob.");
@@ -111,33 +107,19 @@ const DictationNote = () => {
       .catch((error) => console.error("Error accessing microphone:", error));
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream
-        .getTracks()
-        .forEach((track) => track.stop()); // Stop all tracks
-      mediaRecorderRef.current = null; // Clear MediaRecorder reference
-      if (animationControllerRef.current) {
-        cancelAnimationFrame(animationControllerRef.current);
-        animationControllerRef.current = null;
-      }
-      toast.success("Recording stopped");
-    }
-  };
-
-  const transcribeAudio = async (audioBlob) => {
-    const formData = new FormData();
-    formData.append("file", audioBlob);
-
-    const response = await fetch("/api/speech-to-text", {
-      method: "POST",
-      body: formData,
-    });
-
-    const result = await response.json();
-    return result.transcription;
-  };
+  // const retryRequest = async (formData, retries = 3) => {
+  //   let lastError;
+  //   for (let attempt = 1; attempt <= retries; attempt++) {
+  //     try {
+  //       const res = await sendDictation(formData);
+  //       return res;
+  //     } catch (error) {
+  //       lastError = error;
+  //       console.error(`Attempt ${attempt} failed:`, error);
+  //     }
+  //   }
+  //   throw lastError;
+  // };
 
   const handleFileConversion = async (blob) => {
     try {
@@ -148,6 +130,39 @@ const DictationNote = () => {
       }));
     } catch (error) {
       console.error("Error converting Blob to File:", error);
+    }
+  };
+
+  const stopRecording = async () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop()); // Stop all tracks
+      // mediaRecorderRef.current = null; // Clear MediaRecorder reference
+      if (animationControllerRef.current) {
+        cancelAnimationFrame(animationControllerRef.current);
+        animationControllerRef.current = null;
+      }
+
+      if (!formData.audio_file || !formData.name_of_patient) {
+        console.error("Required fields are missing.");
+        return;
+      }
+
+      const transcribeData = new FormData();
+      transcribeData.append("name_of_patient", formData.name_of_patient || "");
+      transcribeData.append("provider_id", formData.provider_id || "");
+      transcribeData.append("audio_file", formData.audio_file);
+      transcribeData.append("comments", formData.comments || "");
+
+      try {
+        const res = await sendDictation(transcribeData);
+        dispatch(setTranscription(res.text));
+        toast.success("Recording stopped and transcription captured.");
+      } catch (error) {
+        console.error("Error cancel dictation:", error);
+      }
     }
   };
 
@@ -166,11 +181,25 @@ const DictationNote = () => {
 
     try {
       const res = await sendDictation(formDataToSend);
+      dispatch(setTranscription(res.text));
+      setFormData({
+        name_of_patient: "",
+        provider_id: provider?.azz_id || "",
+        audio_file: null,
+        comments: "",
+      });
       toast.success(res.message);
       return res;
     } catch (error) {
       console.error("Error sending dictation:", error);
     }
+  };
+
+  const sendTranscription = () => {
+    if (!transcription) {
+      console.error("No transcription available.");
+    }
+    return transcription;
   };
 
   const handlePatientChange = (e) => {
@@ -223,17 +252,17 @@ const DictationNote = () => {
         />
         <textarea
           rows={7}
-          cols={55}
+          cols={60}
           className="bg-white text-gray-500 rounded-xl resize-none focus:outline-none border p-4 my-5"
           placeholder="Comment here..."
           name="comments"
           value={formData.comments}
           onChange={handleCommentsChange}
         />
-        <div className="w-full h-[130px] relative bg-white border rounded-lg mb-10"></div>
+        <div className="w-full h-[104px] relative bg-white border rounded-lg mb-10"></div>
         <canvas
           ref={canvasRef}
-          width={452}
+          width={490}
           className="absolute top-[533px]"
           height={100}
         />
@@ -248,7 +277,7 @@ const DictationNote = () => {
           </button>
           <button
             type="button"
-            className="absolute left-[113px] p-5 bg-blue-900 rounded-full transition-transform transform hover:scale-110 hover:shadow-lg"
+            className="absolute left-[130px] p-5 bg-blue-900 rounded-full transition-transform transform hover:scale-110 hover:shadow-lg"
             onClick={startRecording}
           >
             <AiFillAudio className="text-white" size={40} />

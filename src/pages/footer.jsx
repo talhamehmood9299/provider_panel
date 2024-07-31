@@ -7,7 +7,7 @@ const Footer = () => {
     (state) => state.location.selectedAddress
   );
   return (
-    <div className="relative w-full">
+    <div className="relative w-full z-[1000]">
       <div className="absolute bottom-0 w-full py-3 bg-blue-900 text-white px-24 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <IoLocationOutline size={32} />
