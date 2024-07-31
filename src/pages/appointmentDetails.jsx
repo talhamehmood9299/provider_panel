@@ -42,14 +42,17 @@ const AppointmentDetails = () => {
           setSlotsNameByLocation(extractedSlotsNameByLocation);
 
           const extractedSlots = data.flatMap((item) =>
-            item.slots_by_location.flatMap((location) =>
-              location.slots.map((slot) => ({
-                booked: slot.booked,
-                startTime: new Date(slot.start_time),
-                endTime: new Date(slot.end_time),
-              }))
-            )
+            item.slots_by_location
+              .filter((location) => location.location_name === "ROBBINSVILLE")
+              .flatMap((location) =>
+                location.slots.map((slot) => ({
+                  booked: slot.booked,
+                  startTime: new Date(slot.start_time),
+                  endTime: new Date(slot.end_time),
+                }))
+              )
           );
+
           setSlots(extractedSlots);
         } else {
           console.error("Unexpected data format:", data);
