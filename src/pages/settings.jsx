@@ -80,65 +80,65 @@ const Settings = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl text-blue-900 font-bold pb-4 mb-5 border-b">
-        Update Profile
-      </h2>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <Input
-          label="Full Name"
-          placeholder="Type here"
-          value={formData.name}
-          onChange={handleChange}
-          name="name"
+    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+  <h2 className="text-lg md:text-xl text-blue-900 font-bold pb-2 md:pb-4 mb-3 md:mb-5 border-b">
+    Update Profile
+  </h2>
+  <form className="space-y-3 md:space-y-4" onSubmit={handleSubmit}>
+    <Input
+      label="Full Name"
+      placeholder="Type here"
+      value={formData.name}
+      onChange={handleChange}
+      name="name"
+    />
+    <TextArea
+      label="Description"
+      placeholder="Bio"
+      value={formData.description}
+      onChange={handleChange}
+      name="description"
+    />
+    <Input
+      label="Address"
+      placeholder="Type here to"
+      value={formData.address}
+      onChange={handleChange}
+      name="address"
+    />
+    <Input
+      label="Room no."
+      placeholder="Type here"
+      value={formData.room}
+      onChange={handleChange}
+      name="room"
+    />
+    <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+      <label className="w-full sm:w-32 font-semibold text-black text-center sm:text-left">Profile Image</label>
+      <div className="w-full">
+        <input
+          type="file"
+          name="profileImage"
+          className="file-input file-input-bordered file-input-success bg-white w-full"
+          onChange={handleImageChange}
         />
-        <TextArea
-          label="Description"
-          placeholder="Bio"
-          value={formData.description}
-          onChange={handleChange}
-          name="description"
-        />
-        <Input
-          label="Address"
-          placeholder="Type here"
-          value={formData.address}
-          onChange={handleChange}
-          name="address"
-        />
-        <Input
-          label="Room no."
-          placeholder="Type here"
-          value={formData.room}
-          onChange={handleChange}
-          name="room"
-        />
-        <div className="flex items-center space-x-4 border-b pb-5">
-          <label className="w-32 font-semibold text-black">Profile Image</label>
-          <div className="w-full">
-            <input
-              type="file"
-              name="profileImage"
-              className="file-input file-input-bordered file-input-success bg-white w-full"
-              onChange={handleImageChange}
-            />
-            {profileImage && (
-              <img
-                src={profileImage}
-                alt="Profile"
-                className="mt-4 w-24 h-24 object-cover rounded-md"
-              />
-            )}
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="mt-4 bg-blue-900 hover:bg-blue-800 text-white py-2 w-[10%] rounded-md"
-        >
-          Submit
-        </button>
-      </form>
+        {profileImage && (
+          <img
+            src={profileImage}
+            alt="Profile"
+            className="mt-2 md:mt-4 w-20 md:w-24 h-20 md:h-24 object-cover rounded-md"
+          />
+        )}
+      </div>
     </div>
+    <button
+      type="submit"
+      className="mt-2 -pt-24 sm:mt-24 bg-blue-900 hover:bg-blue-800 text-white py-2 w-full sm:w-auto sm:px-4 rounded-md"
+    >
+      Submit
+    </button>
+  </form>
+</div>
   );
 };
 
