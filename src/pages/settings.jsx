@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Input from "../components/Input";
-import TextArea from "../components/TextArea";
 import { updateProfile } from "../api/apiEndpoints";
 import { useDispatch, useSelector } from "react-redux";
 import { setProvider } from "../redux/reducers/providersReducer";
@@ -78,7 +77,7 @@ const Settings = () => {
           assistant_email: formData.assistant_email,
         })
       );
-      navigate("/assistants/patientCheckIn");
+      navigate("/provider/patientCheckIn");
       toast.success(updatedProviderInfo.message);
     } catch (error) {
       console.error("Error updating profile:", error);

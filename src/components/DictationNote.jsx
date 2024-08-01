@@ -7,16 +7,17 @@ import { IoMdSend } from "react-icons/io";
 import { getPatients, sendDictation } from "../api/apiEndpoints";
 import toast from "react-hot-toast";
 import { visualizeData } from "../helpers/visualizeData";
-import { setTranscription } from "../redux/reducers/recordingReducer";
+import {
+  setFormState,
+  setTranscription,
+} from "../redux/reducers/recordingReducer";
 
 const DictationNote = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
   const provider = useSelector((state) => state.provider.providers);
-  const transcription = useSelector((state) => state.recording.transcription);
   const dispatch = useDispatch();
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
-  const [temporaryTranscription, setTemporaryTranscription] = useState("");
   const [recordedUrl, setRecordedUrl] = useState(null);
   const audioChunksRef = useRef([]);
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ const DictationNote = () => {
     provider_id: provider?.azz_id || "",
     audio_file: null,
     comments: "",
+    text: "",
   });
 
   // Audio visualization setup
@@ -83,7 +85,6 @@ const DictationNote = () => {
             const audioBlob = new Blob(audioChunksRef.current, {
               type: "audio/mpeg ",
             });
-            console.log("Audio Blob:", audioBlob);
             const audioUrl = URL.createObjectURL(audioBlob);
             setRecordedUrl(audioUrl);
             await handleFileConversion(audioBlob);
@@ -107,20 +108,6 @@ const DictationNote = () => {
       .catch((error) => console.error("Error accessing microphone:", error));
   };
 
-  // const retryRequest = async (formData, retries = 3) => {
-  //   let lastError;
-  //   for (let attempt = 1; attempt <= retries; attempt++) {
-  //     try {
-  //       const res = await sendDictation(formData);
-  //       return res;
-  //     } catch (error) {
-  //       lastError = error;
-  //       console.error(`Attempt ${attempt} failed:`, error);
-  //     }
-  //   }
-  //   throw lastError;
-  // };
-
   const handleFileConversion = async (blob) => {
     try {
       const file = new File([blob], "recording.mp3", { type: "audio/mpeg" });
@@ -139,30 +126,12 @@ const DictationNote = () => {
       mediaRecorderRef.current.stream
         .getTracks()
         .forEach((track) => track.stop()); // Stop all tracks
-      // mediaRecorderRef.current = null; // Clear MediaRecorder reference
+      mediaRecorderRef.current = null;
       if (animationControllerRef.current) {
         cancelAnimationFrame(animationControllerRef.current);
         animationControllerRef.current = null;
       }
-
-      if (!formData.audio_file || !formData.name_of_patient) {
-        console.error("Required fields are missing.");
-        return;
-      }
-
-      const transcribeData = new FormData();
-      transcribeData.append("name_of_patient", formData.name_of_patient || "");
-      transcribeData.append("provider_id", formData.provider_id || "");
-      transcribeData.append("audio_file", formData.audio_file);
-      transcribeData.append("comments", formData.comments || "");
-
-      try {
-        const res = await sendDictation(transcribeData);
-        dispatch(setTranscription(res.text));
-        toast.success("Recording stopped and transcription captured.");
-      } catch (error) {
-        console.error("Error cancel dictation:", error);
-      }
+      toast.success("Recording stopped");
     }
   };
 
@@ -178,28 +147,26 @@ const DictationNote = () => {
     formDataToSend.append("provider_id", formData.provider_id);
     formDataToSend.append("audio_file", formData.audio_file);
     formDataToSend.append("comments", formData.comments);
+    formDataToSend.append("text", formData.text || "");
 
     try {
       const res = await sendDictation(formDataToSend);
+      console.log("----------------------", formData);
       dispatch(setTranscription(res.text));
-      setFormData({
-        name_of_patient: "",
-        provider_id: provider?.azz_id || "",
-        audio_file: null,
-        comments: "",
-      });
+      dispatch(
+        setFormState({
+          name_of_patient: formData.name_of_patient,
+          provider_id: formData?.provider_id,
+          audio_file: formData?.audio_file,
+          comments: formData.comments,
+          text: formData.text,
+        })
+      );
       toast.success(res.message);
       return res;
     } catch (error) {
       console.error("Error sending dictation:", error);
     }
-  };
-
-  const sendTranscription = () => {
-    if (!transcription) {
-      console.error("No transcription available.");
-    }
-    return transcription;
   };
 
   const handlePatientChange = (e) => {
@@ -277,7 +244,7 @@ const DictationNote = () => {
           </button>
           <button
             type="button"
-            className="absolute left-[130px] p-5 bg-blue-900 rounded-full transition-transform transform hover:scale-110 hover:shadow-lg"
+            className="absolute left-[127px] p-5 bg-blue-900 rounded-full transition-transform transform hover:scale-110 hover:shadow-lg"
             onClick={startRecording}
           >
             <AiFillAudio className="text-white" size={40} />
@@ -286,7 +253,7 @@ const DictationNote = () => {
             type="submit"
             className="flex items-center justify-between hover:text-blue-900 font-semibold gap-2"
           >
-            <span>SEND</span>
+            <span>NOTES</span>
             <IoMdSend size={22} className="text-black" />
           </button>
         </div>

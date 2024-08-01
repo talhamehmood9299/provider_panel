@@ -123,7 +123,7 @@ const PatientCheckIn = () => {
                 className="hover:bg-gray-100 border-b last:border-none"
               >
                 <TableRow additionalClasses="font-medium text-gray-900">
-                  {`0${index + 1}`}
+                  {`${index + 1}`}
                 </TableRow>
                 <TableRow>{patient.first_name}</TableRow>
                 <TableRow>{patient.lastname}</TableRow>
