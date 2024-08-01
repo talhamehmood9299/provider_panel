@@ -223,17 +223,17 @@ const DictationNote = () => {
         />
         <textarea
           rows={7}
-          cols={55}
+          cols={60}
           className="bg-white text-gray-500 rounded-xl resize-none focus:outline-none border p-4 my-5"
           placeholder="Comment here..."
           name="comments"
           value={formData.comments}
           onChange={handleCommentsChange}
         />
-        <div className="w-full h-[130px] relative bg-white border rounded-lg mb-10"></div>
+        <div className="w-full h-[104px] relative bg-white border rounded-lg mb-10"></div>
         <canvas
           ref={canvasRef}
-          width={452}
+          width={450}
           className="absolute top-[533px]"
           height={100}
         />

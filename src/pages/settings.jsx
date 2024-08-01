@@ -119,7 +119,7 @@ const Settings = () => {
         <input
           type="file"
           name="profileImage"
-          className="file-input file-input-bordered file-input-success bg-white w-full"
+          className="file-input file-input-bordered file-input-primary bg-white w-full"
           onChange={handleImageChange}
         />
         {profileImage && (

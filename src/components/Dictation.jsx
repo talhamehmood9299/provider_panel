@@ -39,14 +39,14 @@ const Dictation = () => {
   }, []);
 
   return (
-    <div className="bg-white shadow-lg p-6 rounded-lg border border-gray-200 w-full max-w-md">
+    <div className="bg-white shadow-lg p-2 rounded-lg border border-gray-200 w-full max-w-md">
       <div className="flex items-center text-xl font-bold mb-6 text-[#1E328F]">
         <div className="mask mask-circle w-20 mr-4">
           <img src={provider.profile} alt="Profile" />
         </div>
         <SearchBox onSearch={handleSearch} />
       </div>
-      <div className="overflow-y-auto h-[550px] scrollbar-thin scrollbar-thumb-scrollbar scrollbar-track-scrollbar-track scrollbar-thumb-hover">
+      <div className="overflow-y-auto h-[560px] scrollbar-thin scrollbar-thumb-scrollbar scrollbar-track-scrollbar-track scrollbar-thumb-hover">
         {filteredDictation?.data?.map((item, i) => (
           <div
             key={i}
