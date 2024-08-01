@@ -39,7 +39,7 @@ const Dictation = () => {
   }, []);
 
   return (
-    <div className="bg-white shadow-lg px-6 py-2 rounded-lg border border-gray-200 w-full max-w-md">
+    <div className="bg-white shadow-lg p-2 rounded-lg border border-gray-200 w-full max-w-md">
       <div className="flex items-center text-xl font-bold mb-6 text-[#1E328F]">
         <div className="mask mask-circle w-20 mr-4">
           <img src={provider.profile} alt="Profile" />

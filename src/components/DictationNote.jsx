@@ -262,7 +262,7 @@ const DictationNote = () => {
         <div className="w-full h-[104px] relative bg-white border rounded-lg mb-10"></div>
         <canvas
           ref={canvasRef}
-          width={490}
+          width={450}
           className="absolute top-[533px]"
           height={100}
         />

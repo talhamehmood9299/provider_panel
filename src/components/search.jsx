@@ -18,7 +18,7 @@ const SearchBox = ({ onSearch }) => {
     <form onSubmit={handleSearch} className="w-full max-w-sm mx-auto">
       <div className="flex items-center border-b-2 border-[#1E328F] py-2">
         <input
-          className="appearance-none bg-transparent border-none w-full text-[#1E328F] mr-3 py-1 px-2 leading-tight focus:outline-none"
+          className="appearance-none bg-transparent border-none w-full text-[#1E328F] mr-3 py-4 px-2 leading-tight focus:outline-none"
           type="text"
           placeholder="Search"
           aria-label="Search"
