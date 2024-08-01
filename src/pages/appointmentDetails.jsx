@@ -8,6 +8,9 @@ import { formatDate, formatTime } from "../helpers";
 
 const AppointmentDetails = () => {
   const provider = useSelector((state) => state.provider.providers);
+  const selectedLocationId = useSelector(
+    (state) => state.location.selectedLocationId
+  );
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   // Separate state variables
@@ -20,11 +23,7 @@ const AppointmentDetails = () => {
     setLoading(true);
     try {
       if (provider && provider.azz_id) {
-        const response = await getSlotsByProvider(
-          provider.azz_id,
-          startDate,
-          endDate
-        );
+        const response = await getSlotsByProvider(provider.azz_id, endDate);
 
         const { data, locations } = response;
 
@@ -33,17 +32,17 @@ const AppointmentDetails = () => {
           setDates(extractedDates);
 
           // Extract slots by location
-          // const extractedSlotsNameByLocation = data.flatMap((item) =>
-          //   item.slots_by_location.map((location) => ({
-          //     locationId: location.location_id,
-          //     locationName: location.location_name,
-          //   }))
-          // );
-          // setSlotsNameByLocation(extractedSlotsNameByLocation);
+          const extractedSlotsNameByLocation = data.flatMap((item) =>
+            item.slots_by_location.map((location) => ({
+              locationId: location.location_id,
+              locationName: location.location_name,
+            }))
+          );
+          setSlotsNameByLocation(extractedSlotsNameByLocation);
 
           const extractedSlots = data.flatMap((item) =>
             item.slots_by_location
-              .filter((location) => location.location_name === "ROBBINSVILLE")
+              .filter((location) => location.location_id === selectedLocationId)
               .flatMap((location) =>
                 location.slots.map((slot) => ({
                   booked: slot.booked,
@@ -52,7 +51,6 @@ const AppointmentDetails = () => {
                 }))
               )
           );
-
           setSlots(extractedSlots);
         } else {
           console.error("Unexpected data format:", data);
