@@ -19,11 +19,27 @@ const AppointmentDetails = () => {
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const ensureDateObject = (date) => {
+    if (typeof date === "string") {
+      const parsedDate = new Date(date);
+      return isNaN(parsedDate) ? null : parsedDate;
+    }
+    return date instanceof Date && !isNaN(date.getTime()) ? date : null;
+  };
   const fetchSlotsByProviders = async () => {
     setLoading(true);
     try {
+      const validStartDate = ensureDateObject(startDate);
+      const validEndDate = ensureDateObject(endDate);
+      if (!validStartDate || !validEndDate) {
+        throw new Error("Invalid date object");
+      }
       if (provider && provider.azz_id) {
-        const response = await getSlotsByProvider(provider.azz_id, endDate);
+        const response = await getSlotsByProvider(
+          provider.azz_id,
+          validStartDate,
+          validEndDate
+        );
 
         const { data, locations } = response;
 
@@ -76,7 +92,16 @@ const AppointmentDetails = () => {
 
   const handleDateSubmit = (e) => {
     e.preventDefault();
-    fetchSlotsByProviders();
+
+    // Convert to Date if necessary
+    const validStartDate = ensureDateObject(startDate);
+    const validEndDate = ensureDateObject(endDate);
+
+    if (validStartDate && validEndDate) {
+      fetchSlotsByProviders();
+    } else {
+      console.error("Invalid date input");
+    }
   };
 
   return (

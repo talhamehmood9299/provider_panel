@@ -42,8 +42,8 @@ export const updateProfile = async (profileData) => {
 export const getSlotsByProvider = async (providerId, startDate, endDate) => {
   const data = await request("/api/v1/slots-by-provider", "get", null, {
     provider_id: providerId,
-    start_date: startDate,
-    end_date: endDate,
+    start_date: startDate.toISOString().split("T")[0],
+    end_date: endDate.toISOString().split("T")[0],
   });
   return data;
 };
