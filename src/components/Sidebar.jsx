@@ -5,12 +5,12 @@ import { ImCross } from "react-icons/im";
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const defaultPath = "/assistants/patientCheckIn";
+  const defaultPath = "/provider/patientCheckIn";
   const [active, setActive] = useState(location.pathname);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (location.pathname === "/assistants") {
+    if (location.pathname === "/provider") {
       navigate(defaultPath);
     } else {
       setActive(location.pathname);
@@ -19,17 +19,17 @@ const Sidebar = () => {
 
   const menuItems = [
     {
-      path: "/assistants/appointmentDetails",
+      path: "/provider/appointmentDetails",
       name: "Appointment Details",
       icon: "📅",
     },
     {
-      path: "/assistants/patientCheckIn",
+      path: "/provider/patientCheckIn",
       name: "Patient Check-In",
       icon: "📍",
     },
-    { path: "/assistants/titanAi", name: "Titan AI", icon: "🤖" },
-    { path: "/assistants/settings", name: "Settings", icon: "⚙️" },
+    { path: "/provider/titanAi", name: "Titan AI", icon: "🤖" },
+    { path: "/provider/settings", name: "Settings", icon: "⚙️" },
   ];
 
   return (
@@ -39,7 +39,7 @@ const Sidebar = () => {
           ${sidebarOpen ? "translate-x-64" : "translate-x-0"}
           lg:hidden
         `}
-        onClick={() => setSidebarOpen(prev => !prev)}
+        onClick={() => setSidebarOpen((prev) => !prev)}
       >
         {sidebarOpen ? <ImCross size={14} /> : "☰"}
       </button>

@@ -105,8 +105,8 @@ const AppointmentDetails = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 pb-28 flex items-start justify-center">
-      <div className="bg-white shadow-lg rounded-2xl overflow-hidden w-full h-[80vh]">
+    <main className="bg-gray-100">
+      <div className="bg-white shadow-lg rounded-2xl overflow-hidden w-full h-[70vh]">
         <div className="p-6">
           <h2 className="text-2xl font-bold text-center mb-6 text-blue-900">
             Select Date & Time
@@ -125,7 +125,7 @@ const AppointmentDetails = () => {
               GO
             </button>
           </div>
-          <div className="space-y-6 max-h-[calc(80vh-200px)] overflow-y-auto">
+          <div className="space-y-6 max-h-[calc(70vh-200px)] overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <span className="loading loading-bars loading-lg"></span>

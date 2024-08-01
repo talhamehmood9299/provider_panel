@@ -3,7 +3,7 @@ import ProtectedRoute from "./components/Protected";
 import Toastify from "./components/Toastify";
 import {
   AppointmentDetails,
-  Assistant,
+  Provider,
   Footer,
   Header,
   Login,
@@ -43,10 +43,10 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path: "/assistants",
+        path: "/provider",
         element: (
           <ProtectedRoute>
-            <Assistant />
+            <Provider />
           </ProtectedRoute>
         ),
         children: [

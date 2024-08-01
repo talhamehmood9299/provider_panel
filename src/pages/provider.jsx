@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import ProfileHeader from "../components/ProfileHeader";
+import Sidebar from "../components/Sidebar.jsx";
+import ProfileHeader from "../components/ProfileHeader.jsx";
 import { logout } from "../redux/reducers/authReducer.js";
 import toast from "react-hot-toast";
 
-const Assistant = () => {
+const Provider = () => {
   const provider = useSelector((state) => state.provider.providers);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,4 +29,4 @@ const Assistant = () => {
   );
 };
 
-export default Assistant;
+export default Provider;

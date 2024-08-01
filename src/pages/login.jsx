@@ -29,7 +29,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/assistants");
+      navigate("/provider");
     }
   }, [isAuthenticated, navigate]);
 
@@ -111,7 +111,7 @@ const Login = () => {
       }
       dispatch(login());
       toast.success("Login successful");
-      navigate("/assistants");
+      navigate("/provider");
     } catch (error) {
       console.error("Error logging in:", error.message);
       if (error.message === "INVALID_LOGIN_CREDENTIALS") {

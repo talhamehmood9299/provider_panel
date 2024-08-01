@@ -4,7 +4,9 @@ const Popup = ({ isOpen, onClose, onConfirm, isLoading }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4 sm:max-w-md md:max-w-lg">
-        <p className="text-blue-900">Are you sure you want to remove?</p>
+        <p className="text-blue-900">
+          Are you sure you want to check out the patient?
+        </p>
         <div className="flex justify-end gap-4 mt-4">
           <button
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-lg"
