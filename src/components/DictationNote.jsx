@@ -19,6 +19,7 @@ const DictationNote = () => {
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [recordedUrl, setRecordedUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
   const audioChunksRef = useRef([]);
   const [formData, setFormData] = useState({
     name_of_patient: "",
@@ -141,6 +142,7 @@ const DictationNote = () => {
       console.error("Required fields are missing.");
       return;
     }
+    setLoading(true);
 
     const formDataToSend = new FormData();
     formDataToSend.append("name_of_patient", formData.name_of_patient);
@@ -151,7 +153,7 @@ const DictationNote = () => {
 
     try {
       const res = await sendDictation(formDataToSend);
-      dispatch(setTranscription(res.text));
+      dispatch(setTranscription(res.text.content));
       dispatch(
         setFormState({
           name_of_patient: formData.name_of_patient,
@@ -172,6 +174,8 @@ const DictationNote = () => {
       return res;
     } catch (error) {
       console.error("Error sending dictation:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -257,10 +261,25 @@ const DictationNote = () => {
           </button>
           <button
             type="submit"
-            className="flex items-center justify-between hover:text-blue-900 font-semibold gap-2"
+            className="relative flex items-center justify-center hover:text-blue-900 font-semibold gap-2"
+            disabled={loading} // Optionally disable the button while loading
           >
-            <span>NOTES</span>
-            <IoMdSend size={22} className="text-black" />
+            {/* Loader */}
+            {loading && (
+              <span className="absolute flex items-center justify-center w-full h-full">
+                <span className="loading loading-dots loading-lg"></span>
+              </span>
+            )}
+
+            {/* Button Text and Icon */}
+            <span
+              className={`flex items-center gap-2 ${
+                loading ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              <span>NOTES</span>
+              <IoMdSend size={22} className="text-black" />
+            </span>
           </button>
         </div>
         {recordedUrl && (
