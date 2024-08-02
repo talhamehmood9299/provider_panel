@@ -32,7 +32,9 @@ export const store = configureStore({
           "persist/PERSIST",
           "persist/PURGE",
           "persist/REGISTER",
+          "recording/setFormState",
         ],
+        ignoredPaths: ["recording.formState.audio_file"],
       },
     }),
 });

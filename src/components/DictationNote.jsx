@@ -151,7 +151,6 @@ const DictationNote = () => {
 
     try {
       const res = await sendDictation(formDataToSend);
-      console.log("----------------------", formData);
       dispatch(setTranscription(res.text));
       dispatch(
         setFormState({
@@ -162,6 +161,13 @@ const DictationNote = () => {
           text: formData.text,
         })
       );
+      setFormData({
+        name_of_patient: "",
+        provider_id: provider?.azz_id || "",
+        audio_file: null,
+        comments: "",
+        text: "",
+      });
       toast.success(res.message);
       return res;
     } catch (error) {

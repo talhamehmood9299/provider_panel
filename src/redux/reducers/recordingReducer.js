@@ -19,12 +19,19 @@ const recordingSlice = createSlice({
     setFormState: (state, action) => {
       state.formState = { ...state.formState, ...action.payload };
     },
-    clearTranscription: (state) => {
-      state.transcription = "";
+    resetFormState: (state) => {
+      state.formState = {
+        name_of_patient: "",
+        provider_id: "",
+        audio_file: null,
+        comments: "",
+        text: "",
+      };
+      state.transcription = {};
     },
   },
 });
 
-export const { setTranscription, clearTranscription, setFormState } =
+export const { setTranscription, resetFormState, setFormState } =
   recordingSlice.actions;
 export default recordingSlice.reducer;

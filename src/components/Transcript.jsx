@@ -1,13 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { sendDictation } from "../api/apiEndpoints";
-import { setFormState } from "../redux/reducers/recordingReducer";
+import {
+  resetFormState,
+  setFormState,
+} from "../redux/reducers/recordingReducer";
 import { toast } from "react-hot-toast";
 
 const Transcript = () => {
   const { text } = useSelector((state) => state.recording.transcription);
   const formState = useSelector((state) => state.recording.formState);
   const dispatch = useDispatch();
-  console.log("form in transcript", formState);
 
   const handleSoapNotes = async () => {
     try {
@@ -21,9 +23,7 @@ const Transcript = () => {
       formData.append("text", formState.text);
 
       const data = await sendDictation(formData);
-      setFormState({
-        text: "",
-      });
+      dispatch(resetFormState());
       toast.success("SOAP notes sent successfully.");
     } catch (error) {
       console.error("Error sending SOAP notes:", error);
