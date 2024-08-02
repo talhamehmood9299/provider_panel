@@ -86,7 +86,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+    <div className=" md:overflow-y-auto h-[65vh] bg-white rounded-lg shadow-md p-4 md:p-6">
       <h2 className="text-lg md:text-xl text-blue-900 font-bold pb-2 md:pb-4 mb-3 md:mb-5 border-b">
         Update Profile
       </h2>
@@ -168,7 +168,7 @@ const Settings = () => {
           </div>
           <button
             type="submit"
-            className="mt-2 -pt-24 sm:mt-24 bg-blue-900 hover:bg-blue-800 text-white py-2 w-full sm:w-auto sm:px-4 rounded-md"
+            className="bg-blue-900 hover:bg-blue-800 text-white p-2 py-2 w-full sm:w-auto sm:px-4 rounded-md"
           >
             Submit
           </button>

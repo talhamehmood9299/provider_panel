@@ -95,62 +95,67 @@ const PatientCheckIn = () => {
 
   return (
     <>
-      <table className="min-w-full divide-y divide-gray-200 shadow-lg rounded-lg overflow-hidden">
-        <thead className="bg-blue-100">
-          <tr>
-            {tableHeaders.map((header, index) => (
-              <th
-                key={header.label}
-                className={`px-4 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-bold text-black capitalize tracking-wider `}
-                colSpan={index === tableHeaders.length - 1 ? 2 : 1}
-              >
-                {header.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="bg-white">
-          {loading ? (
-            <tr>
-              <td colSpan="8" className="text-center py-4">
-                <span className="loading loading-bars loading-lg"></span>{" "}
-              </td>
-            </tr>
-          ) : (
-            patients.map((patient, index) => (
-              <tr
-                key={patient.id}
-                className="hover:bg-gray-100 border-b last:border-none"
-              >
-                <TableRow additionalClasses="font-medium text-gray-900">
-                  {`0${index + 1}`}
-                </TableRow>
-                <TableRow>{patient.first_name}</TableRow>
-                <TableRow>{patient.lastname}</TableRow>
-                <TableRow>{patient.gender}</TableRow>
-                <TableRow>{patient.dob}</TableRow>
-                <TableRow>{patient.appt_time}</TableRow>
-                <TableRow additionalClasses="font-medium">
-                  <button
-                    className="bg-[#1E328F] text-white px-4 py-2 rounded-lg hover:bg-blue-800"
-                    onClick={() => handleCallPatient(patient.patient_id)}
+      <div className="overflow-y-auto md:h-[70vh]">
+        <div className="md:overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 shadow-lg rounded-lg">
+            <thead className="bg-blue-100">
+              <tr>
+                {tableHeaders.map((header, index) => (
+                  <th
+                    key={header.label}
+                    className="px-4 py-3 sm:px-6 sm:py-4 text-center text-xs sm:text-sm font-bold text-black capitalize tracking-wider"
+                    colSpan={index === tableHeaders.length - 1 ? 2 : 1}
                   >
-                    Call Patient
-                  </button>
-                </TableRow>
-                <TableRow>
-                  <button
-                    className="bg-blue-100 hover:bg-blue-200 text-black px-4 py-2 rounded-lg"
-                    onClick={() => handleDeleteClick(patient.patient_id)}
-                  >
-                    Done
-                  </button>
-                </TableRow>
+                    {header.label}
+                  </th>
+                ))}
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody className="bg-white">
+              {loading ? (
+                <tr>
+                  <td colSpan="8" className="text-center py-4">
+                    <span className="loading loading-bars loading-lg"></span>
+                  </td>
+                </tr>
+              ) : (
+                patients.map((patient, index) => (
+                  <tr
+                    key={patient.id}
+                    className="hover:bg-gray-100 border-b last:border-none"
+                  >
+                    <TableRow additionalClasses="font-medium text-gray-900">
+                      {`0${index + 1}`}
+                    </TableRow>
+                    <TableRow>{patient.first_name}</TableRow>
+                    <TableRow>{patient.lastname}</TableRow>
+                    <TableRow>{patient.gender}</TableRow>
+                    <TableRow>{patient.dob}</TableRow>
+                    <TableRow>{patient.appt_time}</TableRow>
+                    <TableRow additionalClasses="font-medium">
+                      <button
+                        className="bg-[#1E328F] text-white px-4 py-2 rounded-lg hover:bg-blue-800"
+                        onClick={() => handleCallPatient(patient.patient_id)}
+                      >
+                        Call Patient
+                      </button>
+                    </TableRow>
+                    <TableRow>
+                      <button
+                        className="bg-blue-100 hover:bg-blue-200 text-black px-4 py-2 rounded-lg"
+                        onClick={() => handleDeleteClick(patient.patient_id)}
+                      >
+                        Done
+                      </button>
+                    </TableRow>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <Popup
         isOpen={isPopupOpen}
         onClose={handleClose}
