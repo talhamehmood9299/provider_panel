@@ -1,10 +1,18 @@
 import clsx from "clsx";
 
-const Select = ({ value, onChange, options, placeholder, styles }) => {
+const Select = ({
+  value,
+  onChange,
+  options,
+  required,
+  placeholder,
+  styles,
+}) => {
   return (
     <div className="relative">
       <select
         value={value}
+        required={required}
         onChange={onChange}
         className={clsx(
           "shadow-lg appearance-none border rounded-lg py-2 px-3 text-gray-500 leading-tight focus:outline-none focus:shadow-outline",

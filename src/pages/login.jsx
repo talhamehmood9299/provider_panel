@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../redux/reducers/authReducer";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../api/firebase";
 import Select from "../components/Select";
 import { toast } from "react-hot-toast";
 // import { getProviders, getLocations } from "../api/service";
+import { login, setUserData } from "../redux/reducers/authReducer";
 import { setProvider } from "../redux/reducers/providersReducer";
 import { setSelectedLocation } from "../redux/reducers/locationReducer";
 import { getLocations, getProviders } from "../api/apiEndpoints";
@@ -46,6 +46,7 @@ const Login = () => {
           description: item.description,
           address: item.address,
           azz_id: item.azz_id,
+          assistant_email: item.assistant_email,
         }));
         setProviderLocal(options);
       } catch (error) {
@@ -81,7 +82,7 @@ const Login = () => {
     }
     try {
       const { email, password } = user;
-      await signInWithEmailAndPassword(auth, email, password);
+      const res = await signInWithEmailAndPassword(auth, email, password);
       const providerInfo = provider.find(
         (item) => item.value === selectedProvider
       );
@@ -94,6 +95,7 @@ const Login = () => {
             description: providerInfo.description,
             address: providerInfo.address,
             azz_id: providerInfo.azz_id,
+            assistant_email: providerInfo.assistant_email,
           })
         );
       }
@@ -109,6 +111,14 @@ const Login = () => {
           })
         );
       }
+
+      const userData = {
+        uid: res.user.uid,
+        email: res.user.email,
+        emailVerified: res.user.emailVerified,
+        accessToken: res.user.accessToken,
+      };
+      dispatch(setUserData(userData));
       dispatch(login());
       toast.success("Login successful");
       navigate("/provider");
@@ -146,6 +156,7 @@ const Login = () => {
           Sign in to your account
         </div>
         <Select
+          required
           value={selectedProvider}
           onChange={handleProviderChange}
           options={provider}

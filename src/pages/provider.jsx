@@ -12,6 +12,7 @@ const Provider = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    localStorage.clear();
     navigate("/");
     toast.success("You are now logged out");
   };
