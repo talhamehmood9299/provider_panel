@@ -11,17 +11,11 @@ import { tableHeaders } from "../data/index.js";
 const PatientCheckIn = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
   const provider = useSelector((state) => state.provider.providers);
-  const user = useSelector((state) => state.auth.user);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const storedData = localStorage.getItem("persist:root");
-  const parsedData = JSON.parse(storedData);
-  const providerData = JSON.parse(parsedData.provider || "{}");
-  const assistantEmail = providerData.providers.assistant_email;
 
   const handleDeleteClick = (id) => {
     setSelectedPatientId(id);
@@ -74,11 +68,6 @@ const PatientCheckIn = () => {
     });
     const callChannel = pusher.subscribe("add-channel");
     callChannel.bind("add-event", function (data) {
-      if (user.email === assistantEmail) {
-        toast.success(
-          `First Name: ${data.firstName}, Last Name: ${data.lastName}, DOB: ${data.dob}`
-        );
-      }
       getPatientsDetail();
     });
 
