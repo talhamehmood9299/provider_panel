@@ -92,10 +92,10 @@ const PatientCheckIn = () => {
 
   return (
     <>
-      <div className="overflow-y-auto md:h-[70vh]">
-        <div className="md:overflow-x-auto">
+      <div className="md:h-[70vh]">
+        <div className="md:overflow-x-auto h-[70vh]">
           <table className="min-w-full divide-y divide-gray-200 shadow-lg rounded-lg">
-            <thead className="bg-blue-100">
+            <thead className="bg-blue-100 sticky top-0">
               <tr>
                 {tableHeaders.map((header, index) => (
                   <th
