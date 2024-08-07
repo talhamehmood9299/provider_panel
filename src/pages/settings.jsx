@@ -31,7 +31,7 @@ const Settings = () => {
         room: provider.room || "",
         profile: provider.profile || "",
         azz_id: provider.azz_id || "",
-        modes: provider.mode || "",
+        modes: provider.modes || "",
         assistant_email: provider.assistant_email || "",
       });
       setProfileImage(provider.profile || "");

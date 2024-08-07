@@ -47,6 +47,7 @@ const Login = () => {
           address: item.address,
           azz_id: item.azz_id,
           assistant_email: item.assistant_email,
+          modes: item.modes,
         }));
         setProviderLocal(options);
       } catch (error) {
@@ -96,6 +97,7 @@ const Login = () => {
             address: providerInfo.address,
             azz_id: providerInfo.azz_id,
             assistant_email: providerInfo.assistant_email,
+            modes: providerInfo.modes,
           })
         );
       }
