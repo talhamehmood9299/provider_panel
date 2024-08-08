@@ -10,6 +10,8 @@ import { formatText } from "../helpers";
 const Transcript = () => {
   const transcription = useSelector((state) => state.recording.transcription);
   const formState = useSelector((state) => state.recording.formState);
+
+  console.log("formState", formState);
   const dispatch = useDispatch();
 
   const text =
@@ -40,8 +42,27 @@ const Transcript = () => {
   return (
     <div className="flex flex-col gap-6 w-full ">
       <h2 className="text-xl font-bold text-[#1E328F]">SOAP Notes</h2>
+      <div className="text-gray-500 bg-white rounded-lg border p-4">
+        <h2 className="text-sm font-bold border-b text-[#1E328F]">
+          Patient Info
+        </h2>
+        <div className="text-sm justify-between overflow-y-auto pt-2">
+          <p className="text-sm font-semibold">
+            Name:{" "}
+            <span className="font-normal">
+              {formState.name_of_patient || "name"}
+            </span>
+          </p>
+          <p className="text-sm font-semibold">
+            Comments:{" "}
+            <span className="font-normal">
+              {formState.comments || "comments"}
+            </span>
+          </p>
+        </div>
+      </div>
       <div
-        className="h-[56vh] overflow-y-auto text-gray-500 bg-white rounded-xl border p-4"
+        className="h-[46vh] overflow-y-auto text-gray-500 bg-white rounded-xl border p-4"
         dangerouslySetInnerHTML={{
           __html: text ? formatText(text) : "No transcription available.",
         }}
@@ -49,7 +70,7 @@ const Transcript = () => {
       <button
         type="button"
         onClick={handleSoapNotes}
-        className="mt-4 bg-blue-900 text-white py-2 px-4 rounded"
+        className="bg-blue-900 text-white py-2 px-4 rounded"
       >
         Send to Assistant
       </button>

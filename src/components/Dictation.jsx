@@ -88,7 +88,7 @@ const Dictation = () => {
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-700">
-                    <span className="font-bold text-blue-900">Text: </span>
+                    <span className="font-bold text-blue-900">SOAP: </span>
                     <span
                       dangerouslySetInnerHTML={{
                         __html: formatText(item.text),
@@ -96,7 +96,7 @@ const Dictation = () => {
                     />
                   </p>
                   <p className="text-sm text-gray-700">
-                    <span className="font-bold text-blue-900">Comments: </span>
+                    <span className="font-bold text-blue-900">COMMENTS: </span>
                     {item.comments}
                   </p>
                 </div>
