@@ -25,3 +25,7 @@ export const formatTime = (date) => {
     hour12: true,
   });
 };
+
+export const formatText = (text) => {
+  return text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+};

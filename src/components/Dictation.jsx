@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import SearchBox from "./Search";
 import { FaChevronCircleDown } from "react-icons/fa";
-import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { getProviderDictations } from "../api/apiEndpoints";
-import { formatDateTime } from "../helpers";
+import { formatDateTime, formatText } from "../helpers";
 
 const Dictation = () => {
   const provider = useSelector((state) => state.provider.providers);
@@ -75,7 +75,11 @@ const Dictation = () => {
               onClick={() => toggleTranscript(i)}
               className="flex items-center justify-center gap-2 cursor-pointer"
             >
-              <IoIosArrowDown className="text-[#1E328F]" size={30} />
+              {isTranscriptVisible[i] ? (
+                <IoIosArrowUp className="text-[#1E328F]" size={30} />
+              ) : (
+                <IoIosArrowDown className="text-[#1E328F]" size={30} />
+              )}
             </div>
             {isTranscriptVisible[i] && (
               <div className="py-4 px-2 bg-white rounded-md shadow-inner">
@@ -84,11 +88,15 @@ const Dictation = () => {
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-700">
-                    <span className="font-bold">Text: </span>
-                    {item.text}
+                    <span className="font-bold text-blue-900">Text: </span>
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: formatText(item.text),
+                      }}
+                    />
                   </p>
                   <p className="text-sm text-gray-700">
-                    <span className="font-bold">Comments: </span>
+                    <span className="font-bold text-blue-900">Comments: </span>
                     {item.comments}
                   </p>
                 </div>

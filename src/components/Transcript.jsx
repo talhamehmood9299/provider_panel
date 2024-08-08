@@ -5,6 +5,7 @@ import {
   setFormState,
 } from "../redux/reducers/recordingReducer";
 import { toast } from "react-hot-toast";
+import { formatText } from "../helpers";
 
 const Transcript = () => {
   const transcription = useSelector((state) => state.recording.transcription);
@@ -39,9 +40,12 @@ const Transcript = () => {
   return (
     <div className="flex flex-col gap-6 w-full ">
       <h2 className="text-xl font-bold text-[#1E328F]">SOAP Notes</h2>
-      <div className="h-[56vh] overflow-y-auto text-gray-500 bg-white rounded-xl border p-4">
-        {text ? text : "No transcription available."}
-      </div>
+      <div
+        className="h-[56vh] overflow-y-auto text-gray-500 bg-white rounded-xl border p-4"
+        dangerouslySetInnerHTML={{
+          __html: text ? formatText(text) : "No transcription available.",
+        }}
+      />
       <button
         type="button"
         onClick={handleSoapNotes}

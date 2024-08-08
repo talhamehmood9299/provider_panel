@@ -21,6 +21,7 @@ const DictationNote = () => {
   const [recordedUrl, setRecordedUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const audioChunksRef = useRef([]);
+  const [isRecording, setIsRecording] = useState(false);
   const [formData, setFormData] = useState({
     name_of_patient: "",
     provider_id: provider?.azz_id || "",
@@ -66,6 +67,7 @@ const DictationNote = () => {
 
   const startRecording = () => {
     setupAudioContext();
+    setIsRecording(true);
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
@@ -90,6 +92,7 @@ const DictationNote = () => {
             setRecordedUrl(audioUrl);
             await handleFileConversion(audioBlob);
             audioChunksRef.current = [];
+            setIsRecording(false);
           } else {
             console.error("No audio chunks available to create Blob.");
           }
@@ -106,7 +109,10 @@ const DictationNote = () => {
         });
         toast.success("Recording started");
       })
-      .catch((error) => console.error("Error accessing microphone:", error));
+      .catch((error) => {
+        console.error("Error accessing microphone:", error);
+        setIsRecording(false);
+      });
   };
 
   const handleFileConversion = async (blob) => {
@@ -133,6 +139,7 @@ const DictationNote = () => {
         animationControllerRef.current = null;
       }
       toast.success("Recording stopped");
+      setIsRecording(false);
     }
   };
 
@@ -205,7 +212,7 @@ const DictationNote = () => {
       if (mediaRecorderRef.current) {
         mediaRecorderRef.current.stream
           .getTracks()
-          .forEach((track) => track.stop()); // Ensure tracks are stopped
+          .forEach((track) => track.stop());
         mediaRecorderRef.current = null;
       }
     };
@@ -250,12 +257,13 @@ const DictationNote = () => {
             onClick={stopRecording}
           >
             <RxCross2 size={20} className="text-black" />
-            <span>CANCEL</span>
+            <span>Finished</span>
           </button>
           <button
             type="button"
             className="absolute left-[127px] p-5 bg-blue-900 rounded-full transition-transform transform hover:scale-110 hover:shadow-lg"
             onClick={startRecording}
+            disabled={isRecording}
           >
             <AiFillAudio className="text-white" size={40} />
           </button>
