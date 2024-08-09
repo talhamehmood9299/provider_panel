@@ -13,11 +13,11 @@ const AppointmentDetails = () => {
   );
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  // Separate state variables
   const [dates, setDates] = useState([]);
   const [slotsNameByLocation, setSlotsNameByLocation] = useState([]);
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // Add error state
 
   const ensureDateObject = (date) => {
     if (typeof date === "string") {
@@ -26,6 +26,7 @@ const AppointmentDetails = () => {
     }
     return date instanceof Date && !isNaN(date.getTime()) ? date : null;
   };
+
   const fetchSlotsByProviders = async () => {
     setLoading(true);
     try {
@@ -47,7 +48,6 @@ const AppointmentDetails = () => {
           const extractedDates = data.map((item) => new Date(item.date));
           setDates(extractedDates);
 
-          // Extract slots by location
           const extractedSlotsNameByLocation = data.flatMap((item) =>
             item.slots_by_location.map((location) => ({
               locationId: location.location_id,
@@ -98,9 +98,15 @@ const AppointmentDetails = () => {
     const validEndDate = ensureDateObject(endDate);
 
     if (validStartDate && validEndDate) {
-      fetchSlotsByProviders();
+      if (validEndDate < validStartDate) {
+        setError("End date cannot be earlier than start date."); // Set error message
+        return;
+      } else {
+        setError(""); // Clear error message
+        fetchSlotsByProviders();
+      }
     } else {
-      console.error("Invalid date input");
+      setError("Invalid date input"); // Set error message
     }
   };
 
@@ -125,6 +131,9 @@ const AppointmentDetails = () => {
               GO
             </button>
           </div>
+          {error && (
+            <div className="text-red-500 text-center mb-4">{error}</div>
+          )}
           <div className="space-y-6 max-h-[calc(70vh-200px)] overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center h-full">
