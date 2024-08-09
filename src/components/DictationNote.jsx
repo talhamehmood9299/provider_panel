@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Select from "./Select";
 import { AiFillAudio } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import { IoMdSend } from "react-icons/io";
@@ -187,8 +186,7 @@ const DictationNote = () => {
     }
   };
 
-  const handlePatientChange = (e) => {
-    const selectedOptionValue = e.target.value;
+  const handlePatientChange = (selectedOptionValue) => {
     const selectedPatient = patientNames.find(
       (option) => option.value === selectedOptionValue
     );
@@ -223,19 +221,7 @@ const DictationNote = () => {
     <div className="flex flex-col gap-6 w-full">
       <h2 className="text-xl font-bold text-[#1E328F]">Dictation Note</h2>
       <form onSubmit={handleSubmit}>
-        <Select
-          value={formData.name_of_patient}
-          onChange={(option) => {
-            setSelectedPatient(option.value);
-            handlePatientChange(option);
-          }}
-          options={patientNames}
-          placeholder="Select Patient"
-          styles={{
-            control: "w-full h-14 border-1 bg-white rounded-lg",
-          }}
-        />
-        {/* <SearchableSelect
+        <SearchableSelect
           value={formData.name_of_patient}
           onChange={(option) => {
             setSelectedPatient(option);
@@ -246,7 +232,7 @@ const DictationNote = () => {
           styles={{
             control: "w-full h-14 border-1 bg-white rounded-lg",
           }}
-        /> */}
+        />
         <textarea
           rows={7}
           cols={60}

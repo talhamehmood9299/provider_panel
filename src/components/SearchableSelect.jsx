@@ -54,7 +54,7 @@ const SearchableSelect = ({
       />
       {/* Dropdown Icon */}
       <div
-        className="cursor-pointer absolute inset-y-0 right-1 flex items-center px-2 text-gray-700"
+        className="cursor-pointer absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <svg
