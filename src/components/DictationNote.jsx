@@ -11,6 +11,7 @@ import {
   setFormState,
   setTranscription,
 } from "../redux/reducers/recordingReducer";
+import SearchableSelect from "./SearchableSelect";
 
 const DictationNote = () => {
   const locationId = useSelector((state) => state.location.selectedLocationId);
@@ -234,6 +235,18 @@ const DictationNote = () => {
             control: "w-full h-14 border-1 bg-white rounded-lg",
           }}
         />
+        {/* <SearchableSelect
+          value={formData.name_of_patient}
+          onChange={(option) => {
+            setSelectedPatient(option);
+            handlePatientChange(option);
+          }}
+          options={patientNames}
+          placeholder="Select Patient"
+          styles={{
+            control: "w-full h-14 border-1 bg-white rounded-lg",
+          }}
+        /> */}
         <textarea
           rows={7}
           cols={60}

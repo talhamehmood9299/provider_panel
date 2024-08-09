@@ -26,31 +26,35 @@ const Dictation = () => {
   };
 
   const getDictations = async () => {
-    const data = await getProviderDictations(provider.azz_id);
-    setDictation(data);
-    setFilteredDictation(data);
+    const { data } = await getProviderDictations(provider.azz_id);
+    const latestData = data.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+
+    setDictation(latestData);
+    setFilteredDictation(latestData);
   };
 
   const handleSearch = (query) => {
     if (!dictation) return;
-    const filteredData = dictation.data.filter((item) =>
+    const filteredData = dictation.filter((item) =>
       item.name_of_patient.toLowerCase().includes(query.toLowerCase())
     );
-    setFilteredDictation({ ...dictation, data: filteredData });
+    setFilteredDictation(filteredData);
   };
 
   const handleValueChange = (newValue) => {
     setValue(newValue);
 
     if (newValue.startDate && newValue.endDate) {
-      const filteredData = dictation.data.filter((item) => {
+      const filteredData = dictation.filter((item) => {
         const dictationDate = new Date(item.created_at);
         return (
           dictationDate >= new Date(newValue.startDate) &&
           dictationDate <= new Date(newValue.endDate)
         );
       });
-      setFilteredDictation({ ...dictation, data: filteredData });
+      setFilteredDictation(filteredData);
     } else {
       setFilteredDictation(dictation);
     }
@@ -70,7 +74,7 @@ const Dictation = () => {
       </div>
       <DateRangePicker value={value} onChange={handleValueChange} />
       <div className="overflow-y-auto h-[510px] scrollbar-thin scrollbar-thumb-scrollbar scrollbar-track-scrollbar-track scrollbar-thumb-hover">
-        {filteredDictation?.data?.map((item, i) => (
+        {filteredDictation?.map((item, i) => (
           <div
             key={i}
             className="mb-6 border border-gray-300 p-4 rounded-lg shadow-lg bg-gray-50"
