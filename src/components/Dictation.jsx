@@ -5,12 +5,17 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { getProviderDictations } from "../api/apiEndpoints";
 import { formatDateTime, formatText } from "../helpers";
+import { DateRangePicker } from "./DateRangePicker";
 
 const Dictation = () => {
   const provider = useSelector((state) => state.provider.providers);
   const [isTranscriptVisible, setIsTranscriptVisible] = useState([]);
   const [dictation, setDictation] = useState(null);
   const [filteredDictation, setFilteredDictation] = useState(null);
+  const [value, setValue] = useState({
+    startDate: null,
+    endDate: null,
+  });
 
   const toggleTranscript = (index) => {
     setIsTranscriptVisible((prev) => {
@@ -34,6 +39,23 @@ const Dictation = () => {
     setFilteredDictation({ ...dictation, data: filteredData });
   };
 
+  const handleValueChange = (newValue) => {
+    setValue(newValue);
+
+    if (newValue.startDate && newValue.endDate) {
+      const filteredData = dictation.data.filter((item) => {
+        const dictationDate = new Date(item.created_at);
+        return (
+          dictationDate >= new Date(newValue.startDate) &&
+          dictationDate <= new Date(newValue.endDate)
+        );
+      });
+      setFilteredDictation({ ...dictation, data: filteredData });
+    } else {
+      setFilteredDictation(dictation);
+    }
+  };
+
   useEffect(() => {
     getDictations();
   }, []);
@@ -46,7 +68,8 @@ const Dictation = () => {
         </div>
         <SearchBox onSearch={handleSearch} />
       </div>
-      <div className="overflow-y-auto h-[560px] scrollbar-thin scrollbar-thumb-scrollbar scrollbar-track-scrollbar-track scrollbar-thumb-hover">
+      <DateRangePicker value={value} onChange={handleValueChange} />
+      <div className="overflow-y-auto h-[510px] scrollbar-thin scrollbar-thumb-scrollbar scrollbar-track-scrollbar-track scrollbar-thumb-hover">
         {filteredDictation?.data?.map((item, i) => (
           <div
             key={i}
